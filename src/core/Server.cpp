@@ -206,13 +206,22 @@ void Server::handleClientData(int& index)
 	}
 	else
 	{
+		//* handle the data
+
 		Client *client = _clients[senderFd];
+
+		// std::cout << "Server::handleClientData()\n" << std::string(buffer, bytesReceived) << "end\n";
 
 		client->addToBuffer(std::string(buffer, bytesReceived));
 
 		std::vector<std::string> lines = client->getLines();
 
-		//* handle the lines
+		std::cout << "\nParsed Lines\n";
+		for(size_t i = 0; i < lines.size(); i++)
+		{
+			std::cout << "Line: "<< i + 1 << " - " << lines[i] << "\n";
+		}
+		std::cout << "end\n";
 	}
 }
 

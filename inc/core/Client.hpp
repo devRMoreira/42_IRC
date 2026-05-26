@@ -10,7 +10,7 @@ class Client
 		Client(int fd);
 
 		void addToBuffer(std::string data);
-		std::vector<std::string> getLines() const;
+		std::vector<std::string> getLines();
 
 		std::string getUsername() const;
 
