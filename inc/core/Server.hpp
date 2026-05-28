@@ -37,6 +37,12 @@ class Server
 		void handleClientData(int& i);
 		void removePfd(int fd);
 
+		void handleLine(Client& client, const std::string& line);
+
+		void handleCap(Client& client, const std::string& line);
+		void handleNick(Client& client, const std::string& line);
+		void handleUser(Client& client, const std::string& line);
+		void handlePass(Client& client, const std::string& line);
 };
 
 

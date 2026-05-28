@@ -5,10 +5,8 @@
 #include <iterator>
 #include <iostream>
 
-Client::Client(int fd) : _fd(fd), _authenticated(false)
+Client::Client(int fd) : _fd(fd), _passAccepted(false)
 {
-	(void)_fd;
-	(void)_authenticated;
 }
 
 void Client::addToBuffer(std::string data)
@@ -39,6 +37,15 @@ std::string Client::getUsername() const
 	return _username;
 }
 
+void Client::setPassAccepted()
+{
+	_passAccepted = true;
+}
+
+void Client::setUsername(const std::string& username)
+{
+	_username = username;
+}
 
 // static int sendMessage(int destFd, char *buffer, int& size)
 // {

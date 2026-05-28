@@ -12,7 +12,9 @@ class Client
 		void addToBuffer(std::string data);
 		std::vector<std::string> getLines();
 
+		void setUsername(const std::string& username);
 		std::string getUsername() const;
+		void setPassAccepted();
 
 	private:
 		int _fd;
@@ -20,8 +22,9 @@ class Client
 		std::string _nickname;
 		std::string _username;
 		std::string _realname;
-		bool _authenticated;
 
+		bool _passAccepted;
+		bool _registered;
 
 };
 
