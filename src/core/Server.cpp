@@ -164,22 +164,17 @@ void Server::handleClientData(int& index)
 }
 
 
-//CAP
-//PW
-//NICK
-//USER
 void Server::handleLine(Client& client, const std::string& line)
 {
 	std::string cmd = extractCmd(line);
+
+	std::cout << cmd << " handleLine\n";
 
 	if(cmd == "CAP ")
 		handleCap(client, line);
 	else if(cmd == "PASS ")
 		handlePass(client, line);
-	else if(cmd == "NICK ")
-		handleNick(client, line);
-	else if(cmd == "USER ")
-		handleUser(client, line);
+
 
 	//!check for registration for other cmds
 	//if(!client.registered)
@@ -187,7 +182,17 @@ void Server::handleLine(Client& client, const std::string& line)
 
 void Server::handleCap(Client& client, const std::string& line)
 {
-	//client.sendMessage("CAP * LS :");
+	std::string arg = extractArg(line);
+
+	if(arg == "END")
+	{
+		std::cout << "END\n";
+		client.setCapEnd();
+	}
+	else
+	{
+		client.sendMessageToClient(":ircserv CAP * LS :\r\n");
+	}
 }
 
 void Server::handlePass(Client& client, const std::string& line)
@@ -200,14 +205,6 @@ void Server::handlePass(Client& client, const std::string& line)
 	// 	client.sendMessage() 464 ERR_PWDMISMATCH
 }
 
-void Server::handleNick(Client& client, const std::string& line)
-{
 
-}
-
-void Server::handleUser(Client& client, const std::string& line)
-{
-
-}
 
 

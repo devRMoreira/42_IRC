@@ -14,6 +14,10 @@ class Client
 
 		void setUsername(const std::string& username);
 		std::string getUsername() const;
+
+		bool getCapEnd() const;
+		void setCapEnd();
+
 		void setPassAccepted();
 		int sendMessageToClient(const std::string& msg);
 
@@ -25,7 +29,9 @@ class Client
 		std::string _realname;
 
 		bool _passAccepted;
+		bool _capEnd;
 		bool _registered;
+
 
 };
 

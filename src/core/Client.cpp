@@ -10,6 +10,7 @@
 
 Client::Client(int fd) : _fd(fd), _passAccepted(false)
 {
+	(void) _registered;
 }
 
 void Client::addToBuffer(std::string data)
@@ -33,11 +34,6 @@ std::vector<std::string> Client::getLines()
 	}
 
 	return lines;
-}
-
-std::string Client::getUsername() const
-{
-	return _username;
 }
 
 static int sendData(int fd, char *buffer, int *len)
@@ -90,25 +86,17 @@ void Client::setUsername(const std::string& username)
 	_username = username;
 }
 
-// static int sendMessage(int destFd, char *buffer, int& size)
-// {
-// 	int totalSent = 0;
-// 	int leftToSend = size;
-// 	int res;
+std::string Client::getUsername() const
+{
+	return _username;
+}
 
-// 	while(totalSent < size)
-// 	{
-// 		res = send(destFd, buffer+totalSent, size, 0);
-// 		if(res == -1)
-// 			break;
-// 		totalSent += res;
-// 		leftToSend -= res;
-// 	}
+bool Client::getCapEnd() const
+{
+	return _capEnd;
+}
 
-// 	size = res;
-
-// 	if(res == -1)
-// 		return -1;
-// 	else
-// 		return 0;
-// }
+void Client::setCapEnd()
+{
+	_capEnd = true;
+}
