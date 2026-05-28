@@ -15,6 +15,7 @@ class Client
 		void setUsername(const std::string& username);
 		std::string getUsername() const;
 		void setPassAccepted();
+		int sendMessageToClient(const std::string& msg);
 
 	private:
 		int _fd;
