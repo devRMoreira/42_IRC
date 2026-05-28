@@ -18,6 +18,9 @@ class Client
 		void setUsername(const std::string& username);
 		std::string getUsername() const;
 
+		void setRealname(const std::string& realname);
+		std::string getRealname() const;
+
 		bool getCapEnd() const;
 		void setCapEnd();
 

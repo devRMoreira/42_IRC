@@ -176,6 +176,8 @@ void Server::handleLine(Client& client, const std::string& line)
 		handlePass(client, line);
 	else if(cmd == "NICK")
 		handleNick(client, line);
+	else if(cmd == "USER")
+		handleUser(client, line);
 		
 
 
@@ -231,16 +233,28 @@ void Server::handleNick(Client& client, const std::string& line)
 	}
 	if (available)
 	{
-		//invalid NICK formats? 432 ERR_ERRONEUSNICKNAME
+		//invalid NICK formats i.e. ? 432 ERR_ERRONEUSNICKNAME
 		//
+		
 		//during registration, server silently accepts user’s request
 		client.setNickname(arg);
+
 		//used after registration, server returns a NICK message
 		if(client.isRegistered())
 			client.sendMessageToClient(std::string("<prefix> NICK :" + client.getNickname() + "\r\n"));
-		
-		std::cout << "your new nick is " << client.getNickname() << "\n";
+
+		// std::cout << "your new nick is " << client.getNickname() << "\n";
 	}
 }
 
+void Server::handleUser(Client& client, const std::string& line) // needs more checks
+{
+	std::string arg = extractArg(line);
+	std::string username = arg.substr(0, arg.find(' '));
+	std::string realname = arg.substr(arg.find(' ') + 1);
 
+	client.setUsername(username);
+	client.setRealname(realname);
+
+	// std::cout << "client user: " << client.getUsername() << " real name : " << client.getRealname() << "\n";
+}

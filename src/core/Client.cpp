@@ -101,6 +101,17 @@ std::string Client::getUsername() const
 	return _username;
 }
 
+void Client::setRealname(const std::string& username)
+{
+	_realname = username;
+}
+
+std::string Client::getRealname() const
+{
+	return _realname;
+}
+
+
 bool Client::getCapEnd() const
 {
 	return _capEnd;

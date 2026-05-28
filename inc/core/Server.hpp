@@ -42,6 +42,7 @@ class Server
 		void handleCap(Client& client, const std::string& line);
 		void handlePass(Client& client, const std::string& line);
 		void handleNick(Client& client, const std::string& line);
+		void handleUser(Client& client, const std::string& line);
 };
 
 
