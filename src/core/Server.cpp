@@ -170,10 +170,13 @@ void Server::handleLine(Client& client, const std::string& line)
 
 	std::cout << cmd << " handleLine\n";
 
-	if(cmd == "CAP ")
+	if(cmd == "CAP")
 		handleCap(client, line);
-	else if(cmd == "PASS ")
+	else if(cmd == "PASS")
 		handlePass(client, line);
+	else if(cmd == "NICK")
+		handleNick(client, line);
+		
 
 
 	//!check for registration for other cmds
@@ -205,6 +208,39 @@ void Server::handlePass(Client& client, const std::string& line)
 	// 	client.sendMessage() 464 ERR_PWDMISMATCH
 }
 
-
+void Server::handleNick(Client& client, const std::string& line)
+{
+	std::string arg = extractArg(line);
+	bool available = true;
+	
+	std::map<int, Client*>::iterator it; 
+	for (it = _clients.begin(); it != _clients.end(); it++)
+	{
+		if (it->second->isRegistered() && arg == it->second->getNickname()) // NO USERS ARE REGISTERED YET
+		{
+			available = false;
+			//433 ERR_NICKNAMEINUSE - format "<client> <nick> :Nickname is already in use"
+			if (client.isRegistered())
+				client.sendMessageToClient(std::string("<prefix> 433 "
+					+ client.getNickname() + arg + " :Nickname is already in use\r\n"));
+			else
+				// * in place of current NICK
+				client.sendMessageToClient(std::string("<prefix> 433 * "
+					+ arg + " :Nickname is already in use\r\n"));
+		}
+	}
+	if (available)
+	{
+		//invalid NICK formats? 432 ERR_ERRONEUSNICKNAME
+		//
+		//during registration, server silently accepts user’s request
+		client.setNickname(arg);
+		//used after registration, server returns a NICK message
+		if(client.isRegistered())
+			client.sendMessageToClient(std::string("<prefix> NICK :" + client.getNickname() + "\r\n"));
+		
+		std::cout << "your new nick is " << client.getNickname() << "\n";
+	}
+}
 
 

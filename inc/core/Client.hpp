@@ -12,6 +12,9 @@ class Client
 		void addToBuffer(std::string data);
 		std::vector<std::string> getLines();
 
+		void setNickname(const std::string& nickname);
+		std::string getNickname() const;
+
 		void setUsername(const std::string& username);
 		std::string getUsername() const;
 
@@ -20,6 +23,8 @@ class Client
 
 		void setPassAccepted();
 		int sendMessageToClient(const std::string& msg);
+
+		bool isRegistered() const;
 
 	private:
 		int _fd;
