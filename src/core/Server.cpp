@@ -153,13 +153,13 @@ void Server::handleClientData(int& index)
 
 		std::vector<std::string> lines = client->getLines();
 
-		std::cout << "\nParsed Lines\n";
+		// std::cout << "\nParsed Lines\n";
 		for(size_t i = 0; i < lines.size(); i++)
 		{
 			std::cout << "Line: "<< i + 1 << " - " << lines[i] << "\n";
 			handleLine(*client, lines[i]);
 		}
-		std::cout << "end\n";
+		// std::cout << "end\n";/
 	}
 }
 
@@ -168,11 +168,11 @@ void Server::handleLine(Client& client, const std::string& line)
 {
 	std::string cmd = extractCmd(line);
 
-	std::cout << cmd << " handleLine\n";
+	std::cout << "cmd: '"<< cmd <<"'\n";
 
-	if(cmd == "CAP ")
+	if(cmd == "CAP")
 		handleCap(client, line);
-	else if(cmd == "PASS ")
+	else if(cmd == "PASS")
 		handlePass(client, line);
 
 
@@ -184,25 +184,29 @@ void Server::handleCap(Client& client, const std::string& line)
 {
 	std::string arg = extractArg(line);
 
-	if(arg == "END")
-	{
-		std::cout << "END\n";
+	std::cout << "arg: '"<< arg <<"'\n";
+
+
+	if(arg == "END" && !client.getCapEnd())
 		client.setCapEnd();
-	}
-	else
-	{
+	else if(!client.getCapEnd())
 		client.sendMessageToClient(":ircserv CAP * LS :\r\n");
-	}
 }
 
 void Server::handlePass(Client& client, const std::string& line)
 {
 	std::string arg = extractArg(line);
 
+
+	std::cout << "arg: '"<< arg <<"'\n";
+
 	if(arg == _password)
 		client.setPassAccepted();
-	// else
-	// 	client.sendMessage() 464 ERR_PWDMISMATCH
+	else
+	{
+		std::cout << "here";
+		client.sendMessageToClient(":ircserv 464 :Password incorrect");
+	}
 }
 
 
