@@ -43,6 +43,8 @@ class Server
 		void handlePass(Client& client, const std::string& line);
 		void handleNick(Client& client, const std::string& line);
 		void handleUser(Client& client, const std::string& line);
+		
+		void attemptRegistration(Client& client);
 };
 
 

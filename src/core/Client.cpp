@@ -8,7 +8,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
-Client::Client(int fd) : _fd(fd), _passAccepted(false)
+Client::Client(int fd) : _fd(fd), _passAccepted(false),  _nickIsSet(false), _userIsSet(false)
 {
 	(void) _registered;
 }
@@ -76,10 +76,37 @@ int Client::sendMessageToClient(const std::string& msg)
 
 	return 0;
 }
+
 void Client::setPassAccepted()
 {
 	_passAccepted = true;
 }
+
+bool Client::getPassAccepted() const
+{
+	return _passAccepted;
+}
+
+void Client::setUserBool()
+{
+	_userIsSet = true;
+}
+
+bool Client::getUserBool() const
+{
+	return _userIsSet;
+}
+
+void Client::setNickBool()
+{
+	_nickIsSet = true;
+}
+
+bool Client::getNickBool() const
+{
+	return _nickIsSet;
+}
+
 
 void Client::setNickname(const std::string& nickname)
 {
@@ -89,11 +116,6 @@ void Client::setNickname(const std::string& nickname)
 std::string Client::getNickname() const
 {
 	return _nickname;
-}
-
-bool Client::getPassAccepted()
-{
-	return _passAccepted;
 }
 
 void Client::setUsername(const std::string& username)
