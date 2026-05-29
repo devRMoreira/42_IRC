@@ -1,17 +1,14 @@
 #include "../../inc/core/Server.hpp"
 #include "../../inc/core/Client.hpp"
 #include "../../inc/constants.hpp"
-
-#include <string.h>
+#include "../../inc/irc.hpp"
 
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include <netdb.h>
 #include <string>
 #include <iostream>
 
-static int initListener(const char* port);
 
 Server::Server(std::string port, std::string pw)
 	: _password(pw), _port(port)
@@ -42,77 +39,19 @@ Server::~Server()
 	}
 }
 
-
-static int initListener(const char* port)
+void Server::run()
 {
-	int listenerFd;
-	int yes = 1;
-	int rv;
-
-	addrinfo hints, *addrinfo, *p;
-
-	memset(&hints, 0, sizeof(hints));
-
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_flags = AI_PASSIVE;
-
-	rv = getaddrinfo(NULL, port, &hints, &addrinfo);
-
-	if(rv != 0)
-		return ServerConstants::ERR_VAL;
-
-	for(p = addrinfo; p != NULL; p = p->ai_next)
+	for(int i = 0; i < getFdCount(); i++)
 	{
-		listenerFd = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
-		if(listenerFd < 0)
-			continue;
-
-		setsockopt(listenerFd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
-
-		if(bind(listenerFd, p->ai_addr, p->ai_addrlen) < 0)
+		if(_pfds[i].revents & (POLLIN | POLLHUP))
 		{
-			close(listenerFd);
-			continue;
+			if(_pfds[i].fd == _listenerFd)
+				handleNewConnection();
+			else
+				handleClientData(i);
+
 		}
-
-		break;
 	}
-
-	if(p == NULL)
-		return ServerConstants::ERR_VAL;
-
-	freeaddrinfo(addrinfo);
-
-	if(listen(listenerFd, 10) == ServerConstants::ERR_VAL)
-		return ServerConstants::ERR_VAL;
-
-	return listenerFd;
-}
-
-static std::string convertToAddress(void *address, char *buffer, size_t size)
-{
-	sockaddr_storage *addressStorage = static_cast<sockaddr_storage*> (address);
-	sockaddr_in *v4address;
-	sockaddr_in6 *v6address;
-	void *src;
-
-	switch(addressStorage->ss_family)
-	{
-		case AF_INET:
-			v4address = static_cast<sockaddr_in*> (address);
-			src = &(v4address->sin_addr);
-			break;
-		case AF_INET6:
-			v6address = static_cast<sockaddr_in6*> (address);
-			src = &(v6address->sin6_addr);
-			break;
-		default:
-			return std::string("Unknown address type");
-	}
-
-	inet_ntop(addressStorage->ss_family, src, buffer, size);
-	return std::string(buffer);
 }
 
 void Server::removePfd(int fd)
@@ -126,7 +65,6 @@ void Server::removePfd(int fd)
         }
     }
 }
-
 
 void Server::disconnectClient(int fd)
 {
@@ -189,7 +127,6 @@ void Server::handleNewConnection()
 	}
 }
 
-
 void Server::handleClientData(int& index)
 {
 	char buffer[ServerConstants::BUFFER_SIZE];
@@ -216,27 +153,61 @@ void Server::handleClientData(int& index)
 
 		std::vector<std::string> lines = client->getLines();
 
-		std::cout << "\nParsed Lines\n";
+		// std::cout << "\nParsed Lines\n";
 		for(size_t i = 0; i < lines.size(); i++)
 		{
 			std::cout << "Line: "<< i + 1 << " - " << lines[i] << "\n";
+			handleLine(*client, lines[i]);
 		}
-		std::cout << "end\n";
+		// std::cout << "end\n";/
 	}
 }
 
 
-void Server::run()
+void Server::handleLine(Client& client, const std::string& line)
 {
-	for(int i = 0; i < getFdCount(); i++)
-	{
-		if(_pfds[i].revents & (POLLIN | POLLHUP))
-		{
-			if(_pfds[i].fd == _listenerFd)
-				handleNewConnection();
-			else
-				handleClientData(i);
+	std::string cmd = extractCmd(line);
 
-		}
+	std::cout << "cmd: '"<< cmd <<"'\n";
+
+	if(cmd == "CAP" && !client.getCapEnd())
+		handleCap(client, line);
+	else if(cmd == "PASS" && !client.getPassAccepted())
+		handlePass(client, line);
+
+
+	//!check for registration for other cmds
+	//if(!client.registered)
+}
+
+void Server::handleCap(Client& client, const std::string& line)
+{
+	std::string arg = extractArg(line);
+
+	std::cout << "arg: '"<< arg <<"'\n";
+
+
+	if(arg == "END")
+		client.setCapEnd();
+	else
+		client.sendMessageToClient(":ircserv CAP * LS :\r\n");
+}
+
+void Server::handlePass(Client& client, const std::string& line)
+{
+	std::string arg = extractArg(line);
+
+
+	std::cout << "arg: '"<< arg <<"'\n";
+
+	if(arg == _password)
+		client.setPassAccepted();
+	else
+	{
+		client.sendMessageToClient(":ircserv " + client.getUsername() + " :Password incorrect");
 	}
 }
+
+
+
+

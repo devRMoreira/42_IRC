@@ -8,10 +8,9 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
-Client::Client(int fd) : _fd(fd), _authenticated(false)
+Client::Client(int fd) : _fd(fd), _passAccepted(false)
 {
-	(void)_fd;
-	(void)_authenticated;
+	(void) _registered;
 }
 
 void Client::addToBuffer(std::string data)
@@ -37,11 +36,6 @@ std::vector<std::string> Client::getLines()
 	return lines;
 }
 
-std::string Client::getUsername() const
-{
-	return _username;
-}
-
 static int sendData(int fd, char *buffer, int *len)
 {
 	int bytesTotal = 0;
@@ -54,10 +48,10 @@ static int sendData(int fd, char *buffer, int *len)
 		if (res == -1)
 			break;
 		bytesTotal += res;
-		bytesLeft -= res;		
+		bytesLeft -= res;
 	}
 
-	*len = bytesTotal; 
+	*len = bytesTotal;
 	if (res == -1)
 		return -1;
 	else
@@ -82,26 +76,32 @@ int Client::sendMessageToClient(const std::string& msg)
 
 	return 0;
 }
+void Client::setPassAccepted()
+{
+	_passAccepted = true;
+}
 
-// static int sendMessage(int destFd, char *buffer, int& size)
-// {
-// 	int totalSent = 0;
-// 	int leftToSend = size;
-// 	int res;
+bool Client::getPassAccepted()
+{
+	return _passAccepted;
+}
 
-// 	while(totalSent < size)
-// 	{
-// 		res = send(destFd, buffer+totalSent, size, 0);
-// 		if(res == -1)
-// 			break;
-// 		totalSent += res;
-// 		leftToSend -= res;
-// 	}
+void Client::setUsername(const std::string& username)
+{
+	_username = username;
+}
 
-// 	size = res;
+std::string Client::getUsername() const
+{
+	return _username;
+}
 
-// 	if(res == -1)
-// 		return -1;
-// 	else
-// 		return 0;
-// }
+bool Client::getCapEnd() const
+{
+	return _capEnd;
+}
+
+void Client::setCapEnd()
+{
+	_capEnd = true;
+}
