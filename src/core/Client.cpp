@@ -81,6 +81,11 @@ void Client::setPassAccepted()
 	_passAccepted = true;
 }
 
+bool Client::getPassAccepted()
+{
+	return _passAccepted;
+}
+
 void Client::setUsername(const std::string& username)
 {
 	_username = username;

@@ -170,9 +170,9 @@ void Server::handleLine(Client& client, const std::string& line)
 
 	std::cout << "cmd: '"<< cmd <<"'\n";
 
-	if(cmd == "CAP")
+	if(cmd == "CAP" && !client.getCapEnd())
 		handleCap(client, line);
-	else if(cmd == "PASS")
+	else if(cmd == "PASS" && !client.getPassAccepted())
 		handlePass(client, line);
 
 
@@ -187,9 +187,9 @@ void Server::handleCap(Client& client, const std::string& line)
 	std::cout << "arg: '"<< arg <<"'\n";
 
 
-	if(arg == "END" && !client.getCapEnd())
+	if(arg == "END")
 		client.setCapEnd();
-	else if(!client.getCapEnd())
+	else
 		client.sendMessageToClient(":ircserv CAP * LS :\r\n");
 }
 
@@ -204,8 +204,7 @@ void Server::handlePass(Client& client, const std::string& line)
 		client.setPassAccepted();
 	else
 	{
-		std::cout << "here";
-		client.sendMessageToClient(":ircserv 464 :Password incorrect");
+		client.sendMessageToClient(":ircserv " + client.getUsername() + " :Password incorrect");
 	}
 }
 
