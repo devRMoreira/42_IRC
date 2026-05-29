@@ -81,6 +81,16 @@ void Client::setPassAccepted()
 	_passAccepted = true;
 }
 
+void Client::setNickname(const std::string& nickname)
+{
+	_nickname = nickname;
+}
+
+std::string Client::getNickname() const
+{
+	return _nickname;
+}
+
 bool Client::getPassAccepted()
 {
 	return _passAccepted;
@@ -96,6 +106,17 @@ std::string Client::getUsername() const
 	return _username;
 }
 
+void Client::setRealname(const std::string& username)
+{
+	_realname = username;
+}
+
+std::string Client::getRealname() const
+{
+	return _realname;
+}
+
+
 bool Client::getCapEnd() const
 {
 	return _capEnd;
@@ -104,4 +125,9 @@ bool Client::getCapEnd() const
 void Client::setCapEnd()
 {
 	_capEnd = true;
+}
+
+bool Client::isRegistered() const
+{
+	return _registered;
 }

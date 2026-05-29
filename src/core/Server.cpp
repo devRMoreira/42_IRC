@@ -174,6 +174,11 @@ void Server::handleLine(Client& client, const std::string& line)
 		handleCap(client, line);
 	else if(cmd == "PASS" && !client.getPassAccepted())
 		handlePass(client, line);
+	else if(cmd == "NICK")
+		handleNick(client, line);
+	else if(cmd == "USER")
+		handleUser(client, line);
+		
 
 
 	//!check for registration for other cmds
@@ -208,6 +213,67 @@ void Server::handlePass(Client& client, const std::string& line)
 	}
 }
 
+static bool areEqualCapitalized(const std::string& str1, const std::string& str2)
+{
+	if (str1.size() != str2.size())
+		return false;
+	else
+	{
+		for (size_t i = 0; i < str1.size(); i++)
+		{
+			if (toupper(str1[i]) != toupper(str2[i]))
+				return(false);
+		}
+	}
+	return true;
+} 
 
+//how to handle whitespace at the edges? AKA 'bingus' vs 'bingus '
+void Server::handleNick(Client& client, const std::string& line)
+{
+	std::string arg = extractArg(line);
+	bool available = true;
+	
+	std::map<int, Client*>::iterator it; 
+	for (it = _clients.begin(); it != _clients.end(); it++)
+	{
+		if (it->second->isRegistered() && areEqualCapitalized(arg, it->second->getNickname()) ) // NO USERS ARE REGISTERED YET
+		{
+			available = false;
+			//433 ERR_NICKNAMEINUSE - format "<client> <nick> :Nickname is already in use"c
+			if (client.isRegistered())
+				client.sendMessageToClient("<prefix> 433 "
+					+ client.getNickname() + arg + " :Nickname is already in use\r\n");
+			else
+				// * in place of current NICK
+				client.sendMessageToClient("<prefix> 433 * "
+					+ arg + " :Nickname is already in use\r\n");
+		}
+	}
+	if (available)
+	{
+		//invalid NICK formats i.e. ? 432 ERR_ERRONEUSNICKNAME
+		//
+		
+		//during registration, server silently accepts user’s request
+		client.setNickname(arg);
 
+		//used after registration, server returns a NICK message
+		if(client.isRegistered())
+			client.sendMessageToClient("<prefix> NICK :" + client.getNickname() + "\r\n");
 
+		// std::cout << "your new nick is " << client.getNickname() << "\n";
+	}
+}
+
+void Server::handleUser(Client& client, const std::string& line) // needs more checks
+{
+	std::string arg = extractArg(line);
+	std::string username = arg.substr(0, arg.find(' '));
+	std::string realname = arg.substr(arg.find(' ') + 1);
+
+	client.setUsername(username);
+	client.setRealname(realname);
+
+	// std::cout << "client user: " << client.getUsername() << " real name : " << client.getRealname() << "\n";
+}
