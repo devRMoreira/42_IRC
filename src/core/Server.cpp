@@ -210,6 +210,22 @@ void Server::handlePass(Client& client, const std::string& line)
 	// 	client.sendMessage() 464 ERR_PWDMISMATCH
 }
 
+static bool areEqualCapitalized(const std::string& str1, const std::string& str2)
+{
+	if (str1.size() != str2.size())
+		return false;
+	else
+	{
+		for (size_t i = 0; i < str1.size(); i++)
+		{
+			if (toupper(str1[i]) != toupper(str2[i]))
+				return(false);
+		}
+	}
+	return true;
+} 
+
+//how to handle whitespace at the edges? AKA 'bingus' vs 'bingus '
 void Server::handleNick(Client& client, const std::string& line)
 {
 	std::string arg = extractArg(line);
@@ -218,7 +234,7 @@ void Server::handleNick(Client& client, const std::string& line)
 	std::map<int, Client*>::iterator it; 
 	for (it = _clients.begin(); it != _clients.end(); it++)
 	{
-		if (it->second->isRegistered() && arg == it->second->getNickname()) // NO USERS ARE REGISTERED YET
+		if (it->second->isRegistered() && areEqualCapitalized(arg, it->second->getNickname()) ) // NO USERS ARE REGISTERED YET
 		{
 			available = false;
 			//433 ERR_NICKNAMEINUSE - format "<client> <nick> :Nickname is already in use"c
@@ -241,7 +257,7 @@ void Server::handleNick(Client& client, const std::string& line)
 
 		//used after registration, server returns a NICK message
 		if(client.isRegistered())
-			client.sendMessageToClient(std::string("<prefix> NICK :" + client.getNickname() + "\r\n"));
+			client.sendMessageToClient("<prefix> NICK :" + client.getNickname() + "\r\n");
 
 		// std::cout << "your new nick is " << client.getNickname() << "\n";
 	}
