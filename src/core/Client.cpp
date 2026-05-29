@@ -91,6 +91,11 @@ std::string Client::getNickname() const
 	return _nickname;
 }
 
+bool Client::getPassAccepted()
+{
+	return _passAccepted;
+}
+
 void Client::setUsername(const std::string& username)
 {
 	_username = username;

@@ -25,6 +25,8 @@ class Client
 		void setCapEnd();
 
 		void setPassAccepted();
+		bool getPassAccepted();
+
 		int sendMessageToClient(const std::string& msg);
 
 		bool isRegistered() const;
