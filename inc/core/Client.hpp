@@ -13,6 +13,7 @@ class Client
 		std::vector<std::string> getLines();
 
 		std::string getUsername() const;
+		int sendMessageToClient(const std::string& msg);
 
 	private:
 		int _fd;
