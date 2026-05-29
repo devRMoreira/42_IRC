@@ -221,14 +221,14 @@ void Server::handleNick(Client& client, const std::string& line)
 		if (it->second->isRegistered() && arg == it->second->getNickname()) // NO USERS ARE REGISTERED YET
 		{
 			available = false;
-			//433 ERR_NICKNAMEINUSE - format "<client> <nick> :Nickname is already in use"
+			//433 ERR_NICKNAMEINUSE - format "<client> <nick> :Nickname is already in use"c
 			if (client.isRegistered())
-				client.sendMessageToClient(std::string("<prefix> 433 "
-					+ client.getNickname() + arg + " :Nickname is already in use\r\n"));
+				client.sendMessageToClient("<prefix> 433 "
+					+ client.getNickname() + arg + " :Nickname is already in use\r\n");
 			else
 				// * in place of current NICK
-				client.sendMessageToClient(std::string("<prefix> 433 * "
-					+ arg + " :Nickname is already in use\r\n"));
+				client.sendMessageToClient("<prefix> 433 * "
+					+ arg + " :Nickname is already in use\r\n");
 		}
 	}
 	if (available)
