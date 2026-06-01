@@ -1,5 +1,20 @@
 #include "../../inc/core/Channel.hpp"
 
+Channel::Channel(const std::string& name) : _name(name)
+{
+}
+
+void Channel::addOperator(Client& client)
+{
+	_operators.push_back(&client);
+}
+
+void Channel::addClient(Client& client)
+{
+	_clients.push_back(&client);
+}
+
+
 // void Channel::broadcast()
 // {
 // 	for(int j = 0; j < _pfds.size(); j++)

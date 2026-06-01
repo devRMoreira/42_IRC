@@ -43,6 +43,12 @@ class Server
 		void handlePass(Client& client, const std::string& line);
 		void handleNick(Client& client, const std::string& line);
 		void handleUser(Client& client, const std::string& line);
+		void handleJoin(Client& client, const std::string& line);
+
+		void createNewChannel(Client&  client, const std::string& arg);
+		void clientJoinChannel(Client&  client, const std::string& arg);
+
+
 };
 
 

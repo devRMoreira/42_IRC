@@ -178,7 +178,8 @@ void Server::handleLine(Client& client, const std::string& line)
 		handleNick(client, line);
 	else if(cmd == "USER")
 		handleUser(client, line);
-		
+	else if(cmd == "JOIN")
+		handleJoin(client, line);
 
 
 	//!check for registration for other cmds
@@ -209,7 +210,7 @@ void Server::handlePass(Client& client, const std::string& line)
 		client.setPassAccepted();
 	else
 	{
-		client.sendMessageToClient(":ircserv " + client.getUsername() + " :Password incorrect");
+		client.sendMessageToClient(":ircserv " + client.getUsername() + " :Password incorrect\r\n");
 	}
 }
 
@@ -226,15 +227,15 @@ static bool areEqualCapitalized(const std::string& str1, const std::string& str2
 		}
 	}
 	return true;
-} 
+}
 
 //how to handle whitespace at the edges? AKA 'bingus' vs 'bingus '
 void Server::handleNick(Client& client, const std::string& line)
 {
 	std::string arg = extractArg(line);
 	bool available = true;
-	
-	std::map<int, Client*>::iterator it; 
+
+	std::map<int, Client*>::iterator it;
 	for (it = _clients.begin(); it != _clients.end(); it++)
 	{
 		if (it->second->isRegistered() && areEqualCapitalized(arg, it->second->getNickname()) ) // NO USERS ARE REGISTERED YET
@@ -254,7 +255,7 @@ void Server::handleNick(Client& client, const std::string& line)
 	{
 		//invalid NICK formats i.e. ? 432 ERR_ERRONEUSNICKNAME
 		//
-		
+
 		//during registration, server silently accepts user’s request
 		client.setNickname(arg);
 

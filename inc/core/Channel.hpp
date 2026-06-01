@@ -9,6 +9,10 @@ class Client;
 class Channel
 {
 	public:
+		Channel(const std::string& name);
+
+		void addOperator(Client& client);
+		void addClient(Client& client);
 
 	private:
 		std::string _name;
