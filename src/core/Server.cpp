@@ -231,19 +231,20 @@ void Server::handlePass(Client& client, const std::string& line)
 		if(arg == _password)
 		{
 			client.setPassAccepted();
-			std::cout << "password accepted\n"; 
+			// std::cout << "password accepted\n"; 
 		}
 		else
 		{
-			std::cout << "wrong! password is:\n'" << _password << "'\nyour input:\n'" << arg << "'\n"; 
-			//	passAccepted should be set to false
-			//	client.sendMessage() 464 ERR_PWDMISMATCH
+			// std::cout << "wrong! password is:\n'" << _password << "'\nyour input:\n'" << arg << "'\n"; 
+			// passAccepted should be set to false
+			// 464 ERR_PWDMISMATCH
+			client.sendMessageToClient(":ircserv 464 " + client.getNickname() + " :Password incorrect\r\n");
 		}
 	}
 	else
 	{
 	//	client.sendMessage() 462 ERR_ALREADYREGISTERED 
-		client.sendMessageToClient(":ircserv " + client.getUsername() + " :Password incorrect\r\n");
+		client.sendMessageToClient(":ircserv 462 " + client.getNickname() + " :You may not reregister\r\n");
 	}
 }
 
@@ -266,46 +267,51 @@ static bool areEqualCapitalized(const std::string& str1, const std::string& str2
 void Server::handleNick(Client& client, const std::string& line)
 {
 	// ERROR :Password required before NICK/USER
+	if (!client.getPassAccepted() )
+	{
+		client.sendMessageToClient(":ircserv * :Password required before NICK/USER\r\n");
+		return ;
+	}
 
 	std::string arg = extractArg(line);
 
 	std::map<int, Client*>::iterator it;
 	for (it = _clients.begin(); it != _clients.end(); it++)
 	{
-		// after match is found, prints and returns
 		if (it->second->isRegistered() && areEqualCapitalized(arg, it->second->getNickname()) ) 
 		{
 			//433 ERR_NICKNAMEINUSE - format "<client> <nick> :Nickname is already in use"c
 			if (client.isRegistered())
-				client.sendMessageToClient("<prefix> 433 "
+				client.sendMessageToClient(":ircserv 433 "
 					+ client.getNickname() + arg + " :Nickname is already in use\r\n");
 			else
 				// * in place of current NICK
-				client.sendMessageToClient("<prefix> 433 * "
+				client.sendMessageToClient(":ircserv 433 * "
 					+ arg + " :Nickname is already in use\r\n");
 			return ;
 		}
 	}
 	//invalid NICK formats i.e. ? 432 ERR_ERRONEUSNICKNAME
-	//
-	
-	//during registration, server silently accepts user’s request
+	//	
 	client.setNickname(arg);
 
-	//used after registration, server returns a NICK message
-	if(client.isRegistered())
-		client.sendMessageToClient("<prefix> NICK :" + client.getNickname() + "\r\n");
-
-	if (!client.isRegistered())
+	if (!client.isRegistered()) //during registration, server silently accepts user’s request
 	{	
 		client.setNickBool();
 		attemptRegistration(client);
 	}
+	else //used after registration, server returns a NICK message
+		client.sendMessageToClient("<prefix> NICK :" + client.getNickname() + "\r\n");
 }
 
 void Server::handleUser(Client& client, const std::string& line) // needs more checks
 {
 	// ERROR :Password required before NICK/USER
+	if (!client.getPassAccepted() )
+	{
+		client.sendMessageToClient(":ircserv * :Password required before NICK/USER\r\n");
+		return ;
+	}
 
 	std::string arg = extractArg(line);
 	std::string username = arg.substr(0, arg.find(' '));
@@ -319,6 +325,11 @@ void Server::handleUser(Client& client, const std::string& line) // needs more c
 	{
 		client.setUserBool();
 		attemptRegistration(client);
+	}
+	else
+	{
+	//	client.sendMessage() 462 ERR_ALREADYREGISTERED 
+		client.sendMessageToClient(":ircserv 462 " + client.getNickname() + " :You may not reregister\r\n");
 	}
 }
 
@@ -372,7 +383,7 @@ void Server::handlePrivMsg(Client& sender, const std::string& line)
 		Channel * targetChannel = channelExists(targetName);
 		if (targetChannel)
 			targetChannel->broadcast(sender, msg);
-		else
+		else //ERR
 			sender.sendMessageToClient("<client> " + targetName + " :Cannot send to channel\r\n");
 		return ;
 	}
