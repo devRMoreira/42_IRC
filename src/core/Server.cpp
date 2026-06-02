@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <string>
 #include <iostream>
+#include <sstream>
 
 
 Server::Server(std::string port, std::string pw)
@@ -153,13 +154,13 @@ void Server::handleClientData(int& index)
 
 		std::vector<std::string> lines = client->getLines();
 
-		// std::cout << "\nParsed Lines\n";
+		std::cout << "\nParsed Lines\n";
 		for(size_t i = 0; i < lines.size(); i++)
 		{
 			std::cout << "Line: "<< i + 1 << " - " << lines[i] << "\n";
 			handleLine(*client, lines[i]);
 		}
-		// std::cout << "end\n";/
+		std::cout << "end\n";
 	}
 }
 
@@ -168,11 +169,11 @@ void Server::handleLine(Client& client, const std::string& line)
 {
 	std::string cmd = extractCmd(line);
 
-	std::cout << "cmd: '"<< cmd <<"'\n";
+	std::cout << cmd << " handleLine\n";
 
-	if(cmd == "CAP" && !client.getCapEnd())
+	if(cmd == "CAP")
 		handleCap(client, line);
-	else if(cmd == "PASS" && !client.getPassAccepted())
+	else if(cmd == "PASS")
 		handlePass(client, line);
 	else if(cmd == "NICK")
 		handleNick(client, line);
@@ -181,6 +182,26 @@ void Server::handleLine(Client& client, const std::string& line)
 	else if(cmd == "JOIN")
 		handleJoin(client, line);
 
+	else if(cmd == "DEBUG")
+	{
+		std::cout << "nick set: " << client.getNickBool() << "\n";
+		if (client.getNickBool())
+			std::cout << "nick: " << client.getNickname() << "\n";
+		std::cout << "user set: " << client.getUserBool() << "\n";
+		if (client.getUserBool())
+		{
+			std::cout << "user: " << client.getUsername() << "\n";
+			std::cout << "real: " << client.getRealname() << "\n";
+		}
+		std::cout << "is registered?: " << client.isRegistered() << "\n";
+	}
+
+	// might need another structure to handle specific, not-registered errors
+	else if(client.isRegistered() )
+	{
+		if(cmd == "PRIVMSG")
+			handlePrivMsg(client, line);
+	}
 
 	//!check for registration for other cmds
 	//if(!client.registered)
@@ -190,26 +211,38 @@ void Server::handleCap(Client& client, const std::string& line)
 {
 	std::string arg = extractArg(line);
 
-	std::cout << "arg: '"<< arg <<"'\n";
-
-
 	if(arg == "END")
+	{
+		std::cout << "END\n";
 		client.setCapEnd();
+	}
 	else
+	{
 		client.sendMessageToClient(":ircserv CAP * LS :\r\n");
+	}
 }
 
 void Server::handlePass(Client& client, const std::string& line)
 {
 	std::string arg = extractArg(line);
 
-
-	std::cout << "arg: '"<< arg <<"'\n";
-
-	if(arg == _password)
-		client.setPassAccepted();
+	if (!client.isRegistered() )
+	{
+		if(arg == _password)
+		{
+			client.setPassAccepted();
+			std::cout << "password accepted\n"; 
+		}
+		else
+		{
+			std::cout << "wrong! password is:\n'" << _password << "'\nyour input:\n'" << arg << "'\n"; 
+			//	passAccepted should be set to false
+			//	client.sendMessage() 464 ERR_PWDMISMATCH
+		}
+	}
 	else
 	{
+	//	client.sendMessage() 462 ERR_ALREADYREGISTERED 
 		client.sendMessageToClient(":ircserv " + client.getUsername() + " :Password incorrect\r\n");
 	}
 }
@@ -232,15 +265,16 @@ static bool areEqualCapitalized(const std::string& str1, const std::string& str2
 //how to handle whitespace at the edges? AKA 'bingus' vs 'bingus '
 void Server::handleNick(Client& client, const std::string& line)
 {
+	// ERROR :Password required before NICK/USER
+
 	std::string arg = extractArg(line);
-	bool available = true;
 
 	std::map<int, Client*>::iterator it;
 	for (it = _clients.begin(); it != _clients.end(); it++)
 	{
-		if (it->second->isRegistered() && areEqualCapitalized(arg, it->second->getNickname()) ) // NO USERS ARE REGISTERED YET
+		// after match is found, prints and returns
+		if (it->second->isRegistered() && areEqualCapitalized(arg, it->second->getNickname()) ) 
 		{
-			available = false;
 			//433 ERR_NICKNAMEINUSE - format "<client> <nick> :Nickname is already in use"c
 			if (client.isRegistered())
 				client.sendMessageToClient("<prefix> 433 "
@@ -249,26 +283,30 @@ void Server::handleNick(Client& client, const std::string& line)
 				// * in place of current NICK
 				client.sendMessageToClient("<prefix> 433 * "
 					+ arg + " :Nickname is already in use\r\n");
+			return ;
 		}
 	}
-	if (available)
-	{
-		//invalid NICK formats i.e. ? 432 ERR_ERRONEUSNICKNAME
-		//
+	//invalid NICK formats i.e. ? 432 ERR_ERRONEUSNICKNAME
+	//
+	
+	//during registration, server silently accepts user’s request
+	client.setNickname(arg);
 
-		//during registration, server silently accepts user’s request
-		client.setNickname(arg);
+	//used after registration, server returns a NICK message
+	if(client.isRegistered())
+		client.sendMessageToClient("<prefix> NICK :" + client.getNickname() + "\r\n");
 
-		//used after registration, server returns a NICK message
-		if(client.isRegistered())
-			client.sendMessageToClient("<prefix> NICK :" + client.getNickname() + "\r\n");
-
-		// std::cout << "your new nick is " << client.getNickname() << "\n";
+	if (!client.isRegistered())
+	{	
+		client.setNickBool();
+		attemptRegistration(client);
 	}
 }
 
 void Server::handleUser(Client& client, const std::string& line) // needs more checks
 {
+	// ERROR :Password required before NICK/USER
+
 	std::string arg = extractArg(line);
 	std::string username = arg.substr(0, arg.find(' '));
 	std::string realname = arg.substr(arg.find(' ') + 1);
@@ -277,4 +315,48 @@ void Server::handleUser(Client& client, const std::string& line) // needs more c
 	client.setRealname(realname);
 
 	// std::cout << "client user: " << client.getUsername() << " real name : " << client.getRealname() << "\n";
+	if (!client.isRegistered())
+	{
+		client.setUserBool();
+		attemptRegistration(client);
+	}
+}
+
+void Server::attemptRegistration(Client& client)
+{
+	if (client.getPassAccepted() && client.getNickBool() && client.getUserBool() )
+	{
+		client.setRegistration();
+		//call function that prints successful registration messages
+	}
+}
+
+Client* Server::nickExists(const std::string& nick)
+{
+	std::map<int, Client*>::iterator it; 
+	for (it = _clients.begin(); it != _clients.end(); it++)
+	{
+		if (it->second->isRegistered() && areEqualCapitalized(nick, it->second->getNickname()) ) 
+		{
+			return it->second;
+		}
+	}
+	return NULL;
+}
+
+void Server::handlePrivMsg(Client& sender, const std::string& line)
+{
+	std::string arg = extractArg(line);
+	std::string nick = arg.substr(0, arg.find(' '));
+	std::string msg = arg.substr(arg.find(' ') + 1);
+
+	Client * target = nickExists(nick);
+	if (target)
+	{
+		target->sendMessageToClient("<prefix> PRIVMSG :" + msg + "\r\n");
+	}
+	else
+	{	//ERR_WASNOSUCHNICK (406)
+		sender.sendMessageToClient("<client> " + nick + " :There was no such nickname\r\n");
+	}
 }

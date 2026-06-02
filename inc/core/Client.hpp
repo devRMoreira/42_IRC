@@ -21,15 +21,22 @@ class Client
 		void setRealname(const std::string& realname);
 		std::string getRealname() const;
 
-		bool getCapEnd() const;
 		void setCapEnd();
+		bool getCapEnd() const;
 
 		void setPassAccepted();
-		bool getPassAccepted();
+		bool getPassAccepted() const;
+
+		void setUserBool();
+		bool getUserBool() const;
+
+		void setNickBool();
+		bool getNickBool() const;
 
 		int sendMessageToClient(const std::string& msg);
 
 		bool isRegistered() const;
+		void setRegistration();
 
 	private:
 		int _fd;
@@ -39,6 +46,8 @@ class Client
 		std::string _realname;
 
 		bool _passAccepted;
+		bool _userIsSet;
+		bool _nickIsSet;
 		bool _capEnd;
 		bool _registered;
 
