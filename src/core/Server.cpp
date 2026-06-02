@@ -331,6 +331,19 @@ void Server::attemptRegistration(Client& client)
 	}
 }
 
+Channel* Server::channelExists(const std::string& channel)
+{
+	std::map<std::string, Channel>::iterator it; 
+	for (it = _channels.begin(); it != _channels.end(); it++)
+	{
+		if (areEqualCapitalized(channel, it->second.getName()) ) 
+		{
+			return &it->second;
+		}
+	}
+	return NULL;
+}
+
 Client* Server::nickExists(const std::string& nick)
 {
 	std::map<int, Client*>::iterator it; 
@@ -347,16 +360,28 @@ Client* Server::nickExists(const std::string& nick)
 void Server::handlePrivMsg(Client& sender, const std::string& line)
 {
 	std::string arg = extractArg(line);
-	std::string nick = arg.substr(0, arg.find(' '));
+	std::string targetName = arg.substr(0, arg.find(' '));
 	std::string msg = arg.substr(arg.find(' ') + 1);
 
-	Client * target = nickExists(nick);
-	if (target)
+	//ADD general chanTypes string (like #&) for leading chars channel names, to distinguish from nicks
+	// if (targetName[0] == '#' || targetName[0] == '&') // default values
+	std::string chanTypes = "#&";
+
+	if (chanTypes.find_first_of(targetName[0]) != std::string::npos) // if targetName's leading char is #/&
 	{
-		target->sendMessageToClient("<prefix> PRIVMSG :" + msg + "\r\n");
+		Channel * targetChannel = channelExists(targetName);
+		if (targetChannel)
+			targetChannel->broadcast(sender, msg);
+		else
+			sender.sendMessageToClient("<client> " + targetName + " :Cannot send to channel\r\n");
+		return ;
 	}
+
+	Client * targetUser = nickExists(targetName);
+	if (targetUser)
+		targetUser->sendMessageToClient(sender.getNickname() + "<prefix> PRIVMSG :" + msg + "\r\n");
 	else
 	{	//ERR_WASNOSUCHNICK (406)
-		sender.sendMessageToClient("<client> " + nick + " :There was no such nickname\r\n");
+		sender.sendMessageToClient("<client> " + targetName + " :There was no such nickname\r\n");
 	}
 }

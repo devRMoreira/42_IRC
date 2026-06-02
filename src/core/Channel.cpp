@@ -28,3 +28,8 @@ void Channel::broadcast(Client& sender, const std::string& msg)
 			_clients[i].client->sendMessageToClient(msg);
 	}
 }
+
+const std::string Channel::getName() const
+{
+	return(_name);
+}

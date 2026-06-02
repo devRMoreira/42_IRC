@@ -17,6 +17,8 @@ class Channel
 		void setTopic(const std::string& topic);
 
 		void broadcast(Client& sender, const std::string& msg);
+
+		const std::string getName() const;
 	private:
 		struct Member
 		{
