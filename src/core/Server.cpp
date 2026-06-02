@@ -181,6 +181,8 @@ void Server::handleLine(Client& client, const std::string& line)
 		handleUser(client, line);
 	else if(cmd == "JOIN")
 		handleJoin(client, line);
+	else if(cmd == "MODE")
+		handleMode(client, line);
 
 	else if(cmd == "DEBUG")
 	{
@@ -231,18 +233,18 @@ void Server::handlePass(Client& client, const std::string& line)
 		if(arg == _password)
 		{
 			client.setPassAccepted();
-			std::cout << "password accepted\n"; 
+			std::cout << "password accepted\n";
 		}
 		else
 		{
-			std::cout << "wrong! password is:\n'" << _password << "'\nyour input:\n'" << arg << "'\n"; 
+			std::cout << "wrong! password is:\n'" << _password << "'\nyour input:\n'" << arg << "'\n";
 			//	passAccepted should be set to false
 			//	client.sendMessage() 464 ERR_PWDMISMATCH
 		}
 	}
 	else
 	{
-	//	client.sendMessage() 462 ERR_ALREADYREGISTERED 
+	//	client.sendMessage() 462 ERR_ALREADYREGISTERED
 		client.sendMessageToClient(":ircserv " + client.getUsername() + " :Password incorrect\r\n");
 	}
 }
@@ -273,7 +275,7 @@ void Server::handleNick(Client& client, const std::string& line)
 	for (it = _clients.begin(); it != _clients.end(); it++)
 	{
 		// after match is found, prints and returns
-		if (it->second->isRegistered() && areEqualCapitalized(arg, it->second->getNickname()) ) 
+		if (it->second->isRegistered() && areEqualCapitalized(arg, it->second->getNickname()) )
 		{
 			//433 ERR_NICKNAMEINUSE - format "<client> <nick> :Nickname is already in use"c
 			if (client.isRegistered())
@@ -288,7 +290,7 @@ void Server::handleNick(Client& client, const std::string& line)
 	}
 	//invalid NICK formats i.e. ? 432 ERR_ERRONEUSNICKNAME
 	//
-	
+
 	//during registration, server silently accepts user’s request
 	client.setNickname(arg);
 
@@ -297,7 +299,7 @@ void Server::handleNick(Client& client, const std::string& line)
 		client.sendMessageToClient("<prefix> NICK :" + client.getNickname() + "\r\n");
 
 	if (!client.isRegistered())
-	{	
+	{
 		client.setNickBool();
 		attemptRegistration(client);
 	}
@@ -333,10 +335,10 @@ void Server::attemptRegistration(Client& client)
 
 Client* Server::nickExists(const std::string& nick)
 {
-	std::map<int, Client*>::iterator it; 
+	std::map<int, Client*>::iterator it;
 	for (it = _clients.begin(); it != _clients.end(); it++)
 	{
-		if (it->second->isRegistered() && areEqualCapitalized(nick, it->second->getNickname()) ) 
+		if (it->second->isRegistered() && areEqualCapitalized(nick, it->second->getNickname()) )
 		{
 			return it->second;
 		}

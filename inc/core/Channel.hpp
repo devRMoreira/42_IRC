@@ -28,6 +28,9 @@ class Channel
 
 		std::string _name;
 		std::string _topic;
+		std::string _key;
+		unsigned int _userLimit;
+		bool _inviteOnly;
 
 		std::vector<Member> _clients;
 };

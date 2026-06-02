@@ -47,11 +47,13 @@ class Server
 		void handleNick(Client& client, const std::string& line);
 		void handleUser(Client& client, const std::string& line);
 		void handlePrivMsg(Client& client, const std::string& line);
-		
+
 		Client* nickExists(const std::string& nick);
 
 		void attemptRegistration(Client& client);
 		void handleJoin(Client& client, const std::string& line);
+		void handleMode(Client& client, const std::string& line);
+
 
 		void createNewChannel(Client&  client, const std::string& arg);
 		void clientJoinChannel(Client&  client, const std::string& arg);
