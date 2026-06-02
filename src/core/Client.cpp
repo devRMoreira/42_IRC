@@ -8,7 +8,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
-Client::Client(int fd) : _fd(fd), _passAccepted(false),  _nickIsSet(false), _userIsSet(false)
+Client::Client(int fd) : _fd(fd), _passAccepted(false), _userIsSet(false), _nickIsSet(false)
 {
 	(void) _registered;
 }
@@ -152,4 +152,9 @@ void Client::setCapEnd()
 bool Client::isRegistered() const
 {
 	return _registered;
+}
+
+void Client::setRegistration()
+{
+	_registered = true; 
 }

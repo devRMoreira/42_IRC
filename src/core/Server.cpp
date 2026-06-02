@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <string>
 #include <iostream>
+#include <sstream>
 
 
 Server::Server(std::string port, std::string pw)
@@ -179,7 +180,26 @@ void Server::handleLine(Client& client, const std::string& line)
 	else if(cmd == "USER")
 		handleUser(client, line);
 
+	else if(cmd == "DEBUG")
+	{
+		std::cout << "nick set: " << client.getNickBool() << "\n";
+		if (client.getNickBool())
+			std::cout << "nick: " << client.getNickname() << "\n";
+		std::cout << "user set: " << client.getUserBool() << "\n";
+		if (client.getUserBool())
+		{
+			std::cout << "user: " << client.getUsername() << "\n";
+			std::cout << "real: " << client.getRealname() << "\n";
+		}
+		std::cout << "is registered?: " << client.isRegistered() << "\n";
+	}
 
+	// might need another structure to handle specific, not-registered errors
+	else if(client.isRegistered() )
+	{
+		if(cmd == "PRIVMSG")
+			handlePrivMsg(client, line);
+	}
 
 	//!check for registration for other cmds
 	//if(!client.registered)
@@ -207,10 +227,16 @@ void Server::handlePass(Client& client, const std::string& line)
 	if (!client.isRegistered() )
 	{
 		if(arg == _password)
+		{
 			client.setPassAccepted();
-	//	else
-	//		passAccepted should be set to false 
-	// 		client.sendMessage() 464 ERR_PWDMISMATCH
+			std::cout << "password accepted\n"; 
+		}
+		else
+		{
+			std::cout << "wrong! password is:\n'" << _password << "'\nyour input:\n'" << arg << "'\n"; 
+			//	passAccepted should be set to false
+			//	client.sendMessage() 464 ERR_PWDMISMATCH
+		}
 	}
 	else
 	{
@@ -236,8 +262,10 @@ static bool areEqualCapitalized(const std::string& str1, const std::string& str2
 //how to handle whitespace at the edges? AKA 'bingus' vs 'bingus '
 void Server::handleNick(Client& client, const std::string& line)
 {
+	// ERROR :Password required before NICK/USER
+
 	std::string arg = extractArg(line);
-	
+
 	std::map<int, Client*>::iterator it; 
 	for (it = _clients.begin(); it != _clients.end(); it++)
 	{
@@ -274,6 +302,8 @@ void Server::handleNick(Client& client, const std::string& line)
 
 void Server::handleUser(Client& client, const std::string& line) // needs more checks
 {
+	// ERROR :Password required before NICK/USER
+
 	std::string arg = extractArg(line);
 	std::string username = arg.substr(0, arg.find(' '));
 	std::string realname = arg.substr(arg.find(' ') + 1);
@@ -295,5 +325,35 @@ void Server::attemptRegistration(Client& client)
 	{
 		client.setRegistration();
 		//call function that prints successful registration messages
+	}
+}
+
+Client* Server::nickExists(const std::string& nick)
+{
+	std::map<int, Client*>::iterator it; 
+	for (it = _clients.begin(); it != _clients.end(); it++)
+	{
+		if (it->second->isRegistered() && areEqualCapitalized(nick, it->second->getNickname()) ) 
+		{
+			return it->second;
+		}
+	}
+	return NULL;
+}
+
+void Server::handlePrivMsg(Client& sender, const std::string& line)
+{
+	std::string arg = extractArg(line);
+	std::string nick = arg.substr(0, arg.find(' '));
+	std::string msg = arg.substr(arg.find(' ') + 1);
+
+	Client * target = nickExists(nick);
+	if (target)
+	{
+		target->sendMessageToClient("<prefix> PRIVMSG :" + msg + "\r\n");
+	}
+	else
+	{	//ERR_WASNOSUCHNICK (406)
+		sender.sendMessageToClient("<client> " + nick + " :There was no such nickname\r\n");
 	}
 }
