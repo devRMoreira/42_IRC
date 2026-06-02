@@ -179,6 +179,8 @@ void Server::handleLine(Client& client, const std::string& line)
 		handleNick(client, line);
 	else if(cmd == "USER")
 		handleUser(client, line);
+	else if(cmd == "JOIN")
+		handleJoin(client, line);
 
 	else if(cmd == "DEBUG")
 	{
@@ -241,6 +243,7 @@ void Server::handlePass(Client& client, const std::string& line)
 	else
 	{
 	//	client.sendMessage() 462 ERR_ALREADYREGISTERED 
+		client.sendMessageToClient(":ircserv " + client.getUsername() + " :Password incorrect\r\n");
 	}
 }
 
@@ -257,7 +260,7 @@ static bool areEqualCapitalized(const std::string& str1, const std::string& str2
 		}
 	}
 	return true;
-} 
+}
 
 //how to handle whitespace at the edges? AKA 'bingus' vs 'bingus '
 void Server::handleNick(Client& client, const std::string& line)
@@ -266,7 +269,7 @@ void Server::handleNick(Client& client, const std::string& line)
 
 	std::string arg = extractArg(line);
 
-	std::map<int, Client*>::iterator it; 
+	std::map<int, Client*>::iterator it;
 	for (it = _clients.begin(); it != _clients.end(); it++)
 	{
 		// after match is found, prints and returns
