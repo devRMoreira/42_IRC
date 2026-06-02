@@ -6,14 +6,18 @@ Channel::Channel(const std::string& name) : _name(name)
 
 void Channel::addOperator(Client& client)
 {
-	_operators.push_back(&client);
+	_clients.push_back(Member(&client, true));
 }
 
 void Channel::addClient(Client& client)
 {
-	_clients.push_back(&client);
+	_clients.push_back(Member(&client, false));
 }
 
+void Channel::setTopic(const std::string& topic)
+{
+	_topic = topic;
+}
 
 // void Channel::broadcast()
 // {

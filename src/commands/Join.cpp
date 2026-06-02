@@ -4,7 +4,7 @@
 #include "../../inc/irc.hpp"
 
 #include <string>
-#include <vector>
+#include <map>
 
 //* Is the client registered? If not, reject it
 //* Does the channel exist?
@@ -23,12 +23,12 @@
 #include <map>
 #include <iterator>
 
-static void printChannels(std::map<std::string, Channel*> channels)
+static void printChannels(std::map<std::string, Channel> channels)
 {
 	std::cout << "Channel list\n" << std::endl;
 	int counter = 1;
 
-	for(std::map<std::string, Channel*>::iterator it = channels.begin(); it != channels.end(); it++)
+	for(std::map<std::string, Channel>::iterator it = channels.begin(); it != channels.end(); it++)
 	{
 		std::cout << counter++ <<" - "<< it->first << std::endl;
 	}
@@ -36,14 +36,13 @@ static void printChannels(std::map<std::string, Channel*> channels)
 
 void Server::clientJoinChannel(Client&  client, const std::string& arg)
 {
-	_channels[arg]->addClient(client);
+	_channels.at(arg).addClient(client);
 }
 
 void Server::createNewChannel(Client&  client, const std::string& arg)
 {
-	Channel channel = Channel(arg);
-	channel.addOperator(client);
-	_channels[arg] = &channel;
+	_channels.insert(std::make_pair(arg, Channel(arg)));
+	_channels.at(arg).addOperator(client);
 }
 
 void Server::handleJoin(Client& client, const std::string& line)

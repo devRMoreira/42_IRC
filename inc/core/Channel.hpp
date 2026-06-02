@@ -14,12 +14,21 @@ class Channel
 		void addOperator(Client& client);
 		void addClient(Client& client);
 
+		void setTopic(const std::string& topic);
+
 	private:
+		struct Member
+		{
+			Client* client;
+			bool isOperator;
+
+			Member(Client *client, bool isOp) : client(client), isOperator(isOp) {}
+		};
+
 		std::string _name;
+		std::string _topic;
 
-		std::vector<Client *> _clients;
-		std::vector<Client *> _operators;
-
+		std::vector<Member> _clients;
 };
 
 #endif
