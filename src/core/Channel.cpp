@@ -1,4 +1,5 @@
 #include "../../inc/core/Channel.hpp"
+#include "../../inc/core/Client.hpp"
 
 Channel::Channel(const std::string& name) : _name(name)
 {
@@ -19,20 +20,11 @@ void Channel::setTopic(const std::string& topic)
 	_topic = topic;
 }
 
-// void Channel::broadcast()
-// {
-// 	for(int j = 0; j < _pfds.size(); j++)
-// 	{
-// 		int destFd = _pfds[j].fd;
-
-// 		if(destFd != _listenerFd && destFd != senderFd)
-// 		{
-// 			if(sendAll(destFd, buffer, bytesReceived) == -1)
-// 			{
-// 				std::cerr << "sendAll error\n";
-// 				std::cout << "Only sent " << bytesReceived << " due to the error!\n";
-
-// 			}
-// 		}
-// 	}
-// }
+void Channel::broadcast(Client& sender, const std::string& msg)
+{
+	for(size_t i = 0; i < _clients.size(); i++)
+	{
+		if(_clients[i].client != &sender)
+			_clients[i].client->sendMessageToClient(msg);
+	}
+}
