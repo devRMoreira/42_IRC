@@ -1,12 +1,14 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
+#include "Channel.hpp"
+
 #include <poll.h>
 #include <map>
 #include <string>
 #include <vector>
 
-class Channel;
+
 class Client;
 
 class Server
@@ -25,9 +27,10 @@ class Server
 		std::string _password;
 		std::string _port;
 
+		//TODO change client to non pointer, it doesnt make sense
 		std::map<int, Client*> _clients;
 
-		std::map<std::string, Channel*> _channels;
+		std::map<std::string, Channel> _channels;
 
 		int _listenerFd;
 
@@ -43,6 +46,12 @@ class Server
 		void handlePass(Client& client, const std::string& line);
 		void handleNick(Client& client, const std::string& line);
 		void handleUser(Client& client, const std::string& line);
+		void handleJoin(Client& client, const std::string& line);
+
+		void createNewChannel(Client&  client, const std::string& arg);
+		void clientJoinChannel(Client&  client, const std::string& arg);
+
+
 };
 
 

@@ -6,6 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <string>
+#include <vector>
 
 std::string extractCmd(const std::string& line)
 {
@@ -15,6 +16,29 @@ std::string extractCmd(const std::string& line)
 std::string extractArg(const std::string& line)
 {
 	return line.substr(line.find(' ') + 1);
+}
+
+std::vector<std::string> extractMultipleArgs(const std::string& line)
+{
+	std::vector<std::string> args;
+
+	size_t pos = line.find(' ') + 1;
+
+	while(pos != std::string::npos)
+	{
+		size_t next = line.find(' ', pos);
+
+		if(next == std::string::npos)
+		{
+			args.push_back(line.substr(pos));
+			break;
+		}
+
+		args.push_back(line.substr(pos, next - pos));
+		pos = next + 1;
+	}
+
+	return args;
 }
 
 int initListener(const char* port)
