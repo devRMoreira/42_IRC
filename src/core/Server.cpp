@@ -6,10 +6,9 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include <string>
+#include <string> 
 #include <iostream>
 #include <sstream>
-
 
 Server::Server(std::string port, std::string pw)
 	: _password(pw), _port(port)
@@ -179,11 +178,9 @@ void Server::handleLine(Client& client, const std::string& line)
 		handleNick(client, line);
 	else if(cmd == "USER")
 		handleUser(client, line);
-	else if(cmd == "JOIN")
-		handleJoin(client, line);
-
 	else if(cmd == "DEBUG")
 	{
+		std::cout << "pass set: " << client.getPassAccepted() << "\n";
 		std::cout << "nick set: " << client.getNickBool() << "\n";
 		if (client.getNickBool())
 			std::cout << "nick: " << client.getNickname() << "\n";
@@ -195,13 +192,21 @@ void Server::handleLine(Client& client, const std::string& line)
 		}
 		std::cout << "is registered?: " << client.isRegistered() << "\n";
 	}
+	//QUIT is the only other non-registered command
 
-	// might need another structure to handle specific, not-registered errors
-	else if(client.isRegistered() )
-	{
-		if(cmd == "PRIVMSG")
-			handlePrivMsg(client, line);
+	else if(!client.isRegistered() )
+	{	// ERR_NOTREGISTERED (451)
+		client.sendMessageToClient(":ircserv 451 " + client.getNickname() + " :You have not registered\n");
+		return ;
 	}
+	else if(cmd == "PRIVMSG")
+		handlePrivMsg(client, line);
+	else if(cmd == "JOIN")
+		handleJoin(client, line);
+	else if(cmd == "INVITE")
+		handleInvite(client, line);
+	else if(cmd == "KICK")
+		handleInvite(client, line);
 
 	//!check for registration for other cmds
 	//if(!client.registered)
@@ -269,7 +274,7 @@ void Server::handleNick(Client& client, const std::string& line)
 	// ERROR :Password required before NICK/USER
 	if (!client.getPassAccepted() )
 	{
-		client.sendMessageToClient(":ircserv * :Password required before NICK/USER\r\n");
+		sendErrorMessage(0, client, std::vector<std::string>());
 		return ;
 	}
 
@@ -396,3 +401,43 @@ void Server::handlePrivMsg(Client& sender, const std::string& line)
 		sender.sendMessageToClient("<client> " + targetName + " :There was no such nickname\r\n");
 	}
 }
+
+void Server::handleInvite(Client& client, const std::string& line)
+{
+	std::string arg = extractArg(line);
+	std::string nickname = arg.substr(0, arg.find(' '));
+	std::string channelName = arg.substr(arg.find(' ') + 1);
+
+	Client * invited = nickExists(nickname);
+	if (!invited)
+	{ // ERR_NOSUCHCHANNEL (403)
+		client.sendMessageToClient(":ircserv " + client.getNickname()
+			+ channelName + " 403 :No such channel");
+	}
+
+	Channel * channel = channelExists(channelName);
+	if (!channel)
+	{ // ERR_NOSUCHCHANNEL (403)
+		client.sendMessageToClient(":ircserv 403 " + client.getNickname()
+			+ channelName + " :No such channel");
+	}
+	// Mode != Private && isChannelMember - only members can invite
+	// else
+	//{ // ERR_NOTONCHANNEL (442)
+		// client.sendMessageToClient(":ircserv " + client.getNickname()
+			// + channelName + " 442 :You're not on that channel");
+	// }
+
+	// Mode = Private && isChannelOp;
+	// else
+	//{ // ERR_CHANOPRIVSNEEDED (482)
+		// client.sendMessageToClient(":ircserv " + client.getNickname()
+			// + channelName + " 482 :You're not channel operator");
+	// }
+
+}
+
+// void Server::handleKick(Client& client, const std::string& line)
+// {
+
+// }

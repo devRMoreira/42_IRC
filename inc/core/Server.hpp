@@ -47,6 +47,8 @@ class Server
 		void handleNick(Client& client, const std::string& line);
 		void handleUser(Client& client, const std::string& line);
 		void handlePrivMsg(Client& client, const std::string& line);
+		void handleInvite(Client& client, const std::string& line);
+		void handleKick(Client& client, const std::string& line);
 		
 		Client* nickExists(const std::string& nick);
 		Channel* channelExists(const std::string& channel);
@@ -57,7 +59,7 @@ class Server
 		void createNewChannel(Client&  client, const std::string& arg);
 		void clientJoinChannel(Client&  client, const std::string& arg);
 
-
+		const std::string errorMessage(int errCode);
 };
 
 
