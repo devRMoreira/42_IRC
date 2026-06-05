@@ -52,6 +52,17 @@ bool Channel::isMember(const std::string& nick) const
 	return false;
 }
 
+bool Channel::isOperator(const std::string& nick) const
+{
+	for(size_t i = 0; i < _members.size(); i++)
+	{
+		if(_members[i].client->getNickname() == nick)
+			return _members[i].isOperator;
+	}
+
+	return false;
+}
+
 void Channel::setKey(const std::string& str)
 {
 	_key = str;

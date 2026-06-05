@@ -16,6 +16,7 @@ class Channel
 		void addClient(Client& client);
 
 		bool isMember(const std::string& nick) const;
+		bool isOperator(const std::string& nick) const;
 
 		void setTopic(const std::string& str);
 		void setKey(const std::string& str);
