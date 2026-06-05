@@ -84,29 +84,37 @@ void Server::parseMode(Client& client, const std::string& line)
 
 	if(args.size() > 0)
 	{
-		std::string channel = args[0];
+		std::string channelName = args[0];
+
 		if(channelExists(args[0]) && args.size() > 1)
 		{
-			size_t i = 1;
-			char type = args[1][0];
+			Channel& channel = _channels.at(channelName);
 
-			std::string modeString;
-			std::vector<std::string> params;
-
-			while(type == ModeFlag::ADD || type == ModeFlag::REMOVE)
+			if(channel.isOperator(client.getNickname()))
 			{
-				modeString+=args[i];
-				i++;
-				type = args[i][0];
-			}
+				size_t i = 1;
+				char type = args[1][0];
 
-			while(i < args.size())
-			{
-				params.push_back(args[i]);
-				i++;
-			}
+				std::string modeString;
+				std::vector<std::string> params;
 
-			handleMode(client, _channels.at(channel), modeString, params);
+				while(type == ModeFlag::ADD || type == ModeFlag::REMOVE)
+				{
+					modeString+=args[i];
+					i++;
+					type = args[i][0];
+				}
+
+				while(i < args.size())
+				{
+					params.push_back(args[i]);
+					i++;
+				}
+
+				handleMode(client, channel, modeString, params);
+			}
+			else
+				client.sendMessageToClient(":ircserv 482 " + client.getNickname() + " " + channelName + " :You're not channel operator");
 		}
 		else
 		{
