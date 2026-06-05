@@ -9,6 +9,9 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <iterator>
+#include <map>
+
 
 
 Server::Server(std::string port, std::string pw)
@@ -182,7 +185,7 @@ void Server::handleLine(Client& client, const std::string& line)
 	else if(cmd == "JOIN")
 		handleJoin(client, line);
 	else if(cmd == "MODE")
-		handleMode(client, line);
+		parseMode(client, line);
 
 	else if(cmd == "DEBUG")
 	{
@@ -361,4 +364,15 @@ void Server::handlePrivMsg(Client& sender, const std::string& line)
 	{	//ERR_WASNOSUCHNICK (406)
 		sender.sendMessageToClient("<client> " + nick + " :There was no such nickname\r\n");
 	}
+}
+
+bool Server::channelExists(const std::string& str)
+{
+	for(std::map<std::string, Channel>::iterator it = _channels.begin(); it != _channels.end(); it++)
+	{
+		if(it->first == str)
+			return true;
+	}
+
+	return false;
 }
