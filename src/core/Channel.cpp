@@ -9,7 +9,7 @@ Channel::Channel(const std::string& name) : _name(name)
 void Channel::debugChannel() const
 {
 	std::cout << "Members" << std::endl;
-	for(int i = 0; i < _members.size(); i++)
+	for(size_t i = 0; i < _members.size(); i++)
 	{
 		std::cout << i << " Nick - " << _members[i].client->getNickname()
 					   << " | Operator " << (_members[i].isOperator == true) << std::endl;
