@@ -336,18 +336,18 @@ void Server::attemptRegistration(Client& client)
 	}
 }
 
-Channel* Server::channelExists(const std::string& channel)
-{
-	std::map<std::string, Channel>::iterator it; 
-	for (it = _channels.begin(); it != _channels.end(); it++)
-	{
-		if (areEqualCapitalized(channel, it->second.getName()) ) 
-		{
-			return &it->second;
-		}
-	}
-	return NULL;
-}
+// Channel* Server::channelExists(const std::string& channel)
+// {
+// 	std::map<std::string, Channel>::iterator it;
+// 	for (it = _channels.begin(); it != _channels.end(); it++)
+// 	{
+// 		if (areEqualCapitalized(channel, it->second.getName()) )
+// 		{
+// 			return &it->second;
+// 		}
+// 	}
+// 	return NULL;
+// }
 
 Client* Server::nickExists(const std::string& nick)
 {
@@ -374,9 +374,9 @@ void Server::handlePrivMsg(Client& sender, const std::string& line)
 
 	if (chanTypes.find_first_of(targetName[0]) != std::string::npos) // if targetName's leading char is #/&
 	{
-		Channel * targetChannel = channelExists(targetName);
-		if (targetChannel)
-			targetChannel->broadcast(sender, msg);
+		// Channel * targetChannel = channelExists(targetName);
+		if (channelExists(targetName))
+			_channels.at(targetName).broadcast(sender, msg);
 		else
 			sender.sendMessageToClient("<client> " + targetName + " :Cannot send to channel\r\n");
 		return ;

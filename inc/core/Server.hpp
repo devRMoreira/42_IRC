@@ -49,7 +49,7 @@ class Server
 		void handlePrivMsg(Client& client, const std::string& line);
 
 		Client* nickExists(const std::string& nick);
-		Channel* channelExists(const std::string& channel);
+		// Channel* channelExists(const std::string& channel);
 
 		void attemptRegistration(Client& client);
 		void handleJoin(Client& client, const std::string& line);
