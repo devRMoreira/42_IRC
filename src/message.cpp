@@ -15,23 +15,24 @@ static std::string buildReply(Reply::Code code, const std::string& client, const
 	{
 		case(Reply::ERR_USERNOTINCHANNEL):
 			msg += client + " " + p1 + " " + p2 + " :They aren't on that channel";
-		break;
+			break;
 
 		case(Reply::ERR_NEEDMOREPARAMS):
 			msg += client + " " + p1 + " :Not enough parameters";
-		break;
+			break;
 
 		case(Reply::ERR_CHANOPRIVSNEEDED):
 			msg += client + " " + p1 + " :You're not channel operator";
-		break;
+			break;
 
 		case(Reply::ERR_UMODEUNKNOWNFLAG):
 			msg += client + " :Unknown MODE flag";
-		break;
+			break;
 
 		default:
 			msg += "";
 	}
+	
 	msg += "\r\n";
 
 	return msg;
