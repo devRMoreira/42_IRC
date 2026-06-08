@@ -2,6 +2,7 @@
 #include "../../inc/core/Channel.hpp"
 #include "../../inc/core/Client.hpp"
 #include "../../inc/constants.hpp"
+#include "../../inc/message.hpp"
 #include "../../inc/irc.hpp"
 
 #include <vector>
@@ -36,7 +37,7 @@ void static handleMode(Client& client, Channel& channel, std::string modeString,
 			else if(adding && paramIndex < params.size())
 				channel.setKey(params[paramIndex++]);
 			else
-				client.sendMessageToClient(":ircserv 461 " + client.getNickname() + " MODE :Not enough parameters");
+				client.sendMessageToClient(createReply(Reply::ERR_NEEDMOREPARAMS, client.getNickname()));
 		}
 		else if(c == ModeFlag::OPERATOR)
 		{
@@ -47,10 +48,10 @@ void static handleMode(Client& client, Channel& channel, std::string modeString,
 				if(channel.isMember(nick))
 					channel.setOperator(nick, adding);
 				else
-					client.sendMessageToClient(":ircserv 441 " + client.getNickname() + nick + channel.getName() + " :User not in channel");
+					client.sendMessageToClient(createReply(Reply::ERR_USERNOTINCHANNEL, client.getNickname(), nick, channel.getName()));
 			}
 			else
-				client.sendMessageToClient(":ircserv 461 " + client.getNickname() + " MODE :Not enough parameters");
+				client.sendMessageToClient(createReply(Reply::ERR_NEEDMOREPARAMS, client.getNickname()));
 
 		}
 		else if(c == ModeFlag::USER_LIMIT)
@@ -71,10 +72,10 @@ void static handleMode(Client& client, Channel& channel, std::string modeString,
 				}
 			}
 			else
-				client.sendMessageToClient(":ircserv 461 " + client.getNickname() + " MODE :Not enough parameters");
+				client.sendMessageToClient(createReply(Reply::ERR_NEEDMOREPARAMS, client.getNickname()));
 		}
 		else
-			client.sendMessageToClient(":ircserv 501 " + client.getNickname() + " :Unknown MODE flag");
+			client.sendMessageToClient(createReply(Reply::ERR_UMODEUNKNOWNFLAG, client.getNickname()));
 	}
 
 	channel.debugChannel();
@@ -114,11 +115,7 @@ void Server::parseMode(Client& client, const std::string& line)
 				handleMode(client, channel, modeString, params);
 			}
 			else
-				client.sendMessageToClient(":ircserv 482 " + client.getNickname() + " " + channelName + " :You're not channel operator");
-		}
-		else
-		{
-			client.sendMessageToClient(":ircserv modes");
+				client.sendMessageToClient(createReply(Reply::ERR_CHANOPRIVSNEEDED, client.getNickname(), channel.getName()));
 		}
 	}
 }

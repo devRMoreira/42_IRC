@@ -4,6 +4,7 @@ CPPFLAGS = -Wall -Wextra -Werror -std=c++98
 NAME = ircserv
 
 SRC = src/main.cpp \
+	  src/message.cpp \
 	  src/utils.cpp \
 	  src/commands/Join.cpp \
 	  src/commands/Mode.cpp \

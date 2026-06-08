@@ -35,4 +35,16 @@ namespace ModeFlag
 
 }
 
+namespace Reply
+{
+	enum Code
+	{
+		ERR_USERNOTINCHANNEL = 441,
+		ERR_NEEDMOREPARAMS = 461,
+		ERR_CHANOPRIVSNEEDED = 482,
+		ERR_UMODEUNKNOWNFLAG = 501
+	};
+
+};
+
 #endif
