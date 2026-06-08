@@ -59,6 +59,14 @@ void Channel::broadcast(Client& sender, const std::string& msg)
 	}
 }
 
+void Channel::broadcast(const std::string& msg)
+{
+	for(size_t i = 0; i < _members.size(); i++)
+	{
+		_members[i].client->sendMessageToClient(msg);
+	}
+}
+
 bool Channel::isMember(const std::string& nick) const
 {
 	for(size_t i = 0; i < _members.size(); i++)
@@ -104,3 +112,14 @@ std::string Channel::getName() const
 {
 	return _name;
 }
+
+bool Channel::isTopicProtected() const
+{
+	return _topicProtected;
+}
+
+std::string Channel::getTopic() const
+{
+	return _topic;
+}
+

@@ -186,6 +186,8 @@ void Server::handleLine(Client& client, const std::string& line)
 		handleJoin(client, line);
 	else if(cmd == "MODE")
 		parseMode(client, line);
+	else if(cmd == "TOPIC")
+		handleTopic(client, line);
 
 	else if(cmd == "DEBUG")
 	{
