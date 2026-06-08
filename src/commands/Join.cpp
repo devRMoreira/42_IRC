@@ -4,7 +4,6 @@
 #include "../../inc/irc.hpp"
 
 #include <string>
-#include <map>
 
 //* Is the client registered? If not, reject it
 //* Does the channel exist?
