@@ -27,6 +27,7 @@ class Channel
 
 		std::string getName() const;
 		void broadcast(Client& sender, const std::string& msg);
+		void debugChannel() const;
 
 	private:
 		struct Member

@@ -32,7 +32,7 @@ void static handleMode(Client& client, Channel& channel, std::string modeString,
 		else if(c == ModeFlag::KEY)
 		{
 			if(!adding)
-				channel.setKey(NULL);
+				channel.setKey("");
 			else if(adding && paramIndex < params.size())
 				channel.setKey(params[paramIndex++]);
 			else
@@ -76,6 +76,8 @@ void static handleMode(Client& client, Channel& channel, std::string modeString,
 		else
 			client.sendMessageToClient(":ircserv 501 " + client.getNickname() + " :Unknown MODE flag");
 	}
+
+	channel.debugChannel();
 }
 
 void Server::parseMode(Client& client, const std::string& line)
@@ -93,16 +95,14 @@ void Server::parseMode(Client& client, const std::string& line)
 			if(channel.isOperator(client.getNickname()))
 			{
 				size_t i = 1;
-				char type = args[1][0];
 
 				std::string modeString;
 				std::vector<std::string> params;
 
-				while(type == ModeFlag::ADD || type == ModeFlag::REMOVE)
+				while(i < args.size() && (args[i][0] == ModeFlag::ADD || args[i][0] == ModeFlag::REMOVE))
 				{
 					modeString+=args[i];
 					i++;
-					type = args[i][0];
 				}
 
 				while(i < args.size())

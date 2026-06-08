@@ -1,8 +1,26 @@
 #include "../../inc/core/Channel.hpp"
 #include "../../inc/core/Client.hpp"
+#include <iostream>
 
 Channel::Channel(const std::string& name) : _name(name)
 {
+}
+
+void Channel::debugChannel() const
+{
+	std::cout << "Members" << std::endl;
+	for(int i = 0; i < _members.size(); i++)
+	{
+		std::cout << i << " Nick - " << _members[i].client->getNickname()
+					   << " | Operator " << (_members[i].isOperator == true) << std::endl;
+	}
+
+	std::cout << "Name : " << _name << std::endl;
+	std::cout << "Topic : " << _topic << std::endl;
+	std::cout << "Topic protected : " << (_topicProtected == true) << std::endl;
+	std::cout << "Key : " << _key << std::endl;
+	std::cout << "User limit : " << _userLimit << std::endl;
+	std::cout << "Invite only : " << (_inviteOnly == true) << std::endl;
 }
 
 void Channel::addOperator(Client& client)
