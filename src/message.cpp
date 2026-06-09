@@ -13,8 +13,24 @@ static std::string buildReply(Reply::Code code, const std::string& client, const
 
 	switch (code)
 	{
+		case(Reply::RPL_NOTOPIC):
+			msg += client + " " + p1 + " :No topic is set";
+			break;
+
+		case(Reply::RPL_TOPIC):
+			msg += client + " " + p1 + " :" + p2;
+			break;
+
+		case(Reply::ERR_NOSUCHCHANNEL):
+			msg += client + " " + p1 + " :No such channel";
+			break;
+
 		case(Reply::ERR_USERNOTINCHANNEL):
 			msg += client + " " + p1 + " " + p2 + " :They aren't on that channel";
+			break;
+
+		case(Reply::ERR_NOTONCHANNEL):
+			msg += client + " " + p1 + " :You're not on that channel";
 			break;
 
 		case(Reply::ERR_NEEDMOREPARAMS):
@@ -32,7 +48,7 @@ static std::string buildReply(Reply::Code code, const std::string& client, const
 		default:
 			msg += "";
 	}
-	
+
 	msg += "\r\n";
 
 	return msg;

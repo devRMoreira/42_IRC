@@ -89,7 +89,7 @@ void Server::parseMode(Client& client, const std::string& line)
 	{
 		std::string channelName = args[0];
 
-		if(channelExists(args[0]) && args.size() > 1)
+		if(channelExists(channelName) && args.size() > 1)
 		{
 			Channel& channel = _channels.at(channelName);
 

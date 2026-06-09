@@ -33,7 +33,7 @@ class Client
 		void setNickBool();
 		bool getNickBool() const;
 
-		int sendMessageToClient(const std::string& msg);
+		int sendMessageToClient(const std::string& msg) const;
 
 		bool isRegistered() const;
 		void setRegistration();
