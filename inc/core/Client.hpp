@@ -21,6 +21,8 @@ class Client
 		void setRealname(const std::string& realname);
 		std::string getRealname() const;
 
+		std::string getPrefix() const;
+		
 		void setCapEnd();
 		bool getCapEnd() const;
 
@@ -37,6 +39,7 @@ class Client
 
 		bool isRegistered() const;
 		void setRegistration();
+
 
 	private:
 		int _fd;

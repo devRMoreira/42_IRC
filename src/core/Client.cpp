@@ -138,7 +138,6 @@ std::string Client::getRealname() const
 	return _realname;
 }
 
-
 bool Client::getCapEnd() const
 {
 	return _capEnd;
@@ -157,4 +156,9 @@ bool Client::isRegistered() const
 void Client::setRegistration()
 {
 	_registered = true;
+}
+
+std::string Client::getPrefix() const
+{
+	return ":" + getNickname() + "!" + getUsername() + "@ircserv ";
 }

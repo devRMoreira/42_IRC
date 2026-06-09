@@ -58,13 +58,10 @@ static void changeTopic(Channel& channel, const Client& client, const std::vecto
 		client.sendMessageToClient(createReply(Reply::ERR_CHANOPRIVSNEEDED, client.getNickname(), channel.getName()));
 	else
 	{
-
 		channel.setTopic(topic);
 
-		std::string msg =
-						":" + client.getNickname() +
-						"!" + client.getUsername() +
-						"@ircserv TOPIC " + channel.getName() +
+		std::string msg = client.getPrefix() +
+						"TOPIC " + channel.getName() +
 						" :" + topic + "\r\n";
 
 		channel.broadcast(msg);
