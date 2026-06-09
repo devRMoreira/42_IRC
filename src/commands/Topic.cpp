@@ -6,6 +6,7 @@
 
 #include <string>
 
+
 static bool isEmpty(const std::string& arg)
 {
 	return arg.size() == 1 && arg[0] == ':';
@@ -18,11 +19,12 @@ static std::string extractTopic(const std::vector<std::string>& args)
 	for(size_t i = 1; i < args.size(); i++)
 	{
 		topic += args[i];
-		if((args.begin() + i + 1) != args.end())
+		if(i + 1 < args.size())
 			topic += " ";
 	}
 
-	topic.erase(topic.begin());
+	if(!topic.empty() && topic[0] == ':')
+		topic.erase(topic.begin());
 
 	return topic;
 }
@@ -35,18 +37,28 @@ static void topicReply(const Channel& channel, const Client& client)
 		client.sendMessageToClient(createReply(Reply::RPL_TOPIC, client.getNickname(), channel.getName(), channel.getTopic()));
 }
 
+#include <iostream>
+
 static void changeTopic(Channel& channel, const Client& client, const std::vector<std::string>& args)
 {
 	std::string topic;
+
+	std::cout << "HERE" << std::endl;
+	for(size_t i = 0; i < args.size(); i++)
+	{
+		std::cout << i << " " << args[i] << std::endl;
+	}
+
 	if(args.size() == 2 && isEmpty(args[1]))
 		topic = "";
 	else
-		extractTopic(args);
+		topic = extractTopic(args);
 
 	if(channel.isTopicProtected() && !channel.isOperator(client.getNickname()))
 		client.sendMessageToClient(createReply(Reply::ERR_CHANOPRIVSNEEDED, client.getNickname(), channel.getName()));
 	else
 	{
+
 		channel.setTopic(topic);
 
 		std::string msg =
@@ -63,6 +75,13 @@ void Server::handleTopic(Client& client, const std::string& line)
 {
 	std::vector<std::string> args = extractMultipleArgs(line);
 
+
+	std::cout << "HERE" << std::endl;
+	for(size_t i = 0; i < args.size(); i++)
+	{
+		std::cout << i << " " << args[i] << std::endl;
+	}
+
 	if(args.size() > 0)
 	{
 		std::string channelName = args[0];
@@ -73,7 +92,7 @@ void Server::handleTopic(Client& client, const std::string& line)
 
 			if(!channel.isMember(client.getNickname()))
 			{
-				client.sendMessageToClient(createReply(Reply::ERR_USERNOTINCHANNEL, client.getNickname(), channel.getName()));
+				client.sendMessageToClient(createReply(Reply::ERR_NOTONCHANNEL, client.getNickname(), channel.getName()));
 			}
 			else if(args.size() == 1)
 			{
@@ -88,5 +107,9 @@ void Server::handleTopic(Client& client, const std::string& line)
 		{
 			client.sendMessageToClient(createReply(Reply::ERR_NOSUCHCHANNEL, client.getNickname(), channelName));
 		}
+	}
+	else
+	{
+		client.sendMessageToClient(createReply(Reply::ERR_NEEDMOREPARAMS, client.getNickname(), "TOPIC"));
 	}
 }
