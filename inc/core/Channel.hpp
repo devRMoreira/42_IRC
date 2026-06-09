@@ -17,6 +17,10 @@ class Channel
 		void addOperator(Client& client);
 
 		void addClient(Client& client);
+		void removeClient(Client& client);
+
+		bool isMember(const std::string& nick) const;
+		bool isOperator(const std::string& nick) const;
 
 		bool isMember(const std::string& nick) const;
 		bool isOperator(const std::string& nick) const;
@@ -32,10 +36,11 @@ class Channel
 
 		std::string getTopic() const;
 
-		std::string getName() const;
 		void broadcast(const std::string& msg);
 		void broadcast(Client& sender, const std::string& msg);
 		void debugChannel() const;
+
+		const std::string getName() const;
 
 	private:
 		struct Member

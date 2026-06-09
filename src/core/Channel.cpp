@@ -2,6 +2,8 @@
 #include "../../inc/core/Client.hpp"
 #include <iostream>
 
+#include <algorithm>
+
 Channel::Channel(const std::string& name) : _name(name)
 {
 }
@@ -31,6 +33,18 @@ void Channel::addOperator(Client& client)
 void Channel::addClient(Client& client)
 {
 	_members.push_back(Member(&client, false));
+}
+
+void Channel::removeClient(Client& client)
+{
+	std::vector<Member>::iterator it;
+	for (it = _members.begin(); it != _members.end(); it++)
+	{
+		if (it->client == &client)
+			break;
+	}
+	if (it != _members.end() )
+		_members.erase(it);
 }
 
 void Channel::setOperator(const std::string& nick, bool val)
