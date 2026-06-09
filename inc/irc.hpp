@@ -11,4 +11,6 @@ std::string extractCmd(const std::string& line);
 std::string extractArg(const std::string& line);
 std::vector<std::string> extractMultipleArgs(const std::string& line);
 
+bool isNumeric(const std::string& str);
+
 #endif

@@ -51,15 +51,21 @@ class Server
 		void handleKick(Client& client, const std::string& line);
 		
 		Client* nickExists(const std::string& nick);
-		Channel* channelExists(const std::string& channel);
+		// Channel* channelExists(const std::string& channel);
 
 		void attemptRegistration(Client& client);
 		void handleJoin(Client& client, const std::string& line);
+		void parseMode(Client& client, const std::string& line);
+		void handleTopic(Client& client, const std::string& line);
 
 		void createNewChannel(Client&  client, const std::string& arg);
 		void clientJoinChannel(Client&  client, const std::string& arg);
 
 		const std::string errorMessage(int errCode);
+		bool channelExists(const std::string& str);
+;
+
+
 };
 
 

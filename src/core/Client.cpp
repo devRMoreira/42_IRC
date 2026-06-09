@@ -58,7 +58,7 @@ static int sendData(int fd, char *buffer, int *len)
 		return 0;
 }
 
-int Client::sendMessageToClient(const std::string& msg)
+int Client::sendMessageToClient(const std::string& msg) const
 {
 	int	len = msg.size();
 	char buffer[len + 1];
@@ -138,7 +138,6 @@ std::string Client::getRealname() const
 	return _realname;
 }
 
-
 bool Client::getCapEnd() const
 {
 	return _capEnd;
@@ -156,5 +155,10 @@ bool Client::isRegistered() const
 
 void Client::setRegistration()
 {
-	_registered = true; 
+	_registered = true;
+}
+
+std::string Client::getPrefix() const
+{
+	return ":" + getNickname() + "!" + getUsername() + "@ircserv ";
 }

@@ -9,6 +9,9 @@
 #include <string> 
 #include <iostream>
 #include <sstream>
+#include <iterator>
+#include <map>
+
 
 Server::Server(std::string port, std::string pw)
 	: _password(pw), _port(port)
@@ -178,6 +181,13 @@ void Server::handleLine(Client& client, const std::string& line)
 		handleNick(client, line);
 	else if(cmd == "USER")
 		handleUser(client, line);
+	else if(cmd == "JOIN")
+		handleJoin(client, line);
+	else if(cmd == "MODE")
+		parseMode(client, line);
+	else if(cmd == "TOPIC")
+		handleTopic(client, line);
+
 	else if(cmd == "DEBUG")
 	{
 		std::cout << "pass set: " << client.getPassAccepted() << "\n";
@@ -347,25 +357,25 @@ void Server::attemptRegistration(Client& client)
 	}
 }
 
-Channel* Server::channelExists(const std::string& channel)
-{
-	std::map<std::string, Channel>::iterator it; 
-	for (it = _channels.begin(); it != _channels.end(); it++)
-	{
-		if (areEqualCapitalized(channel, it->second.getName()) ) 
-		{
-			return &it->second;
-		}
-	}
-	return NULL;
-}
+// Channel* Server::channelExists(const std::string& channel)
+// {
+// 	std::map<std::string, Channel>::iterator it;
+// 	for (it = _channels.begin(); it != _channels.end(); it++)
+// 	{
+// 		if (areEqualCapitalized(channel, it->second.getName()) )
+// 		{
+// 			return &it->second;
+// 		}
+// 	}
+// 	return NULL;
+// }
 
 Client* Server::nickExists(const std::string& nick)
 {
-	std::map<int, Client*>::iterator it; 
+	std::map<int, Client*>::iterator it;
 	for (it = _clients.begin(); it != _clients.end(); it++)
 	{
-		if (it->second->isRegistered() && areEqualCapitalized(nick, it->second->getNickname()) ) 
+		if (it->second->isRegistered() && areEqualCapitalized(nick, it->second->getNickname()) )
 		{
 			return it->second;
 		}
@@ -385,10 +395,10 @@ void Server::handlePrivMsg(Client& sender, const std::string& line)
 
 	if (chanTypes.find_first_of(targetName[0]) != std::string::npos) // if targetName's leading char is #/&
 	{
-		Channel * targetChannel = channelExists(targetName);
-		if (targetChannel)
-			targetChannel->broadcast(sender, ":" + sender.getNickname() + " PRIVMSG " + targetName + " :" + msg + "\r\n");
-		else //ERR
+		// Channel * targetChannel = channelExists(targetName);
+		if (channelExists(targetName))
+			_channels.at(targetName).broadcast(sender, msg);
+		else
 			sender.sendMessageToClient("<client> " + targetName + " :Cannot send to channel\r\n");
 		return ;
 	}
@@ -485,5 +495,16 @@ void Server::handleKick(Client& client, const std::string& line)
 	//SUCESS
 	channel->broadcast(client, ":" + client.getNickname() + " KICK " + channelName + " " + nickname + " :optional comment");
 	client.sendMessageToClient(":" + client.getNickname() + " KICK " + channelName + " " + nickname + " :optional comment");
-	channel->removeClient(*kicked);
+	channel->removeClient(*kicked); 
+}
+
+bool Server::channelExists(const std::string& str)
+{
+	for(std::map<std::string, Channel>::iterator it = _channels.begin(); it != _channels.end(); it++)
+	{
+		if(it->first == str)
+			return true;
+	}
+
+	return false;
 }

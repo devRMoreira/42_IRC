@@ -6,21 +6,39 @@
 
 class Client;
 
+//TODO
+//Send RPL_TOPIC/NOTOPIC on user joining channel
+
 class Channel
 {
 	public:
 		Channel(const std::string& name);
 
 		void addOperator(Client& client);
+
 		void addClient(Client& client);
 		void removeClient(Client& client);
 
 		bool isMember(const std::string& nick) const;
 		bool isOperator(const std::string& nick) const;
 
-		void setTopic(const std::string& topic);
+		bool isMember(const std::string& nick) const;
+		bool isOperator(const std::string& nick) const;
 
+		bool isTopicProtected() const;
+
+		void setTopic(const std::string& str);
+		void setKey(const std::string& str);
+		void setUserLimit(unsigned int n);
+		void setInviteOnly(const bool val);
+		void setTopicProtected(const bool val);
+		void setOperator(const std::string& nick, bool val);
+
+		std::string getTopic() const;
+
+		void broadcast(const std::string& msg);
 		void broadcast(Client& sender, const std::string& msg);
+		void debugChannel() const;
 
 		const std::string getName() const;
 
@@ -35,8 +53,13 @@ class Channel
 
 		std::string _name;
 		std::string _topic;
+		std::string _key;
+		unsigned int _userLimit;
+		bool _inviteOnly;
+		bool _topicProtected;
 
 		std::vector<Member> _members;
+
 };
 
 #endif

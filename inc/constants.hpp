@@ -11,4 +11,44 @@ namespace ServerConstants
     };
 }
 
+namespace ChannelConstants
+{
+    enum
+    {
+        MAX_CLIENTS = 32767
+    };
+}
+
+namespace ModeFlag
+{
+    enum
+    {
+        INVALID = 0,
+        INVITE = 'i',
+        TOPIC = 't',
+        KEY = 'k',
+        OPERATOR = 'o',
+        USER_LIMIT = 'l',
+        ADD = '+',
+        REMOVE = '-'
+    };
+
+}
+
+namespace Reply
+{
+	enum Code
+	{
+		RPL_NOTOPIC = 331,
+		RPL_TOPIC = 332,
+		ERR_NOSUCHCHANNEL = 403,
+		ERR_USERNOTINCHANNEL = 441,
+		ERR_NOTONCHANNEL = 442,
+		ERR_NEEDMOREPARAMS = 461,
+		ERR_CHANOPRIVSNEEDED = 482,
+		ERR_UMODEUNKNOWNFLAG = 501
+	};
+
+};
+
 #endif

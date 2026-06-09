@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <string>
 #include <vector>
+#include <cctype>
 
 std::string extractCmd(const std::string& line)
 {
@@ -22,9 +23,14 @@ std::vector<std::string> extractMultipleArgs(const std::string& line)
 {
 	std::vector<std::string> args;
 
-	size_t pos = line.find(' ') + 1;
+	size_t pos = line.find(' ');
 
-	while(pos != std::string::npos)
+	if(pos == std::string::npos)
+		return args;
+
+	pos++;
+
+	while(pos < line.size())
 	{
 		size_t next = line.find(' ', pos);
 
@@ -39,6 +45,17 @@ std::vector<std::string> extractMultipleArgs(const std::string& line)
 	}
 
 	return args;
+}
+
+bool isNumeric(const std::string& str)
+{
+	for(size_t i = 0; i < str.size(); i++)
+	{
+		if(!isdigit(str[i]))
+			return false;
+	}
+
+	return true;
 }
 
 int initListener(const char* port)
