@@ -19,6 +19,37 @@ std::string extractArg(const std::string& line)
 	return line.substr(line.find(' ') + 1);
 }
 
+std::vector<std::string> splitString(const std::string& str, char delim)
+{
+	std::vector<std::string> res;
+
+	size_t i = 0;
+
+	while(i <= str.size())
+	{
+		size_t pos = str.find(delim, i);
+
+		if (pos == std::string::npos)
+		{
+			res.push_back(str.substr(i));
+			break;
+		}
+
+		res.push_back(str.substr(i, pos - i));
+		i = pos + 1;
+	}
+
+	return res;
+}
+
+std::string normalizeString(const std::string& str)
+{
+	std::string res;
+	for(size_t i = 0; i < str.size(); i++)
+		res.push_back(std::tolower(str[i]));
+	return res;
+}
+
 std::vector<std::string> extractMultipleArgs(const std::string& line)
 {
 	std::vector<std::string> args;

@@ -2,25 +2,34 @@
 #include "../../inc/core/Channel.hpp"
 #include "../../inc/core/Client.hpp"
 #include "../../inc/irc.hpp"
+#include "../../inc/constants.hpp"
+#include "../../inc/message.hpp"
 
 #include <string>
+#include <cctype>
+#include <utility>
 
-//* Is the client registered? If not, reject it
-//* Does the channel exist?
-//* No → create it, the client becomes its first member and automatically an operator
-//* Yes → proceed
-//* Does the channel have any restrictions?
-//* Invite only → is this client on the invite list?
-//* Has a password → did they send the right one?
-//* Has a user limit → is the channel full?
-//* If all checks pass, add the client to the channel's member list
-//* Tell everyone in the channel that this client joined — including the client themselves
-//* Send the new client the channel topic if there is one
-//* Send the new client the list of who is currently in the channel
+static bool isValidChannelName(const std::string& arg)
+{
+	if(arg.empty())
+		return false;
 
-#include <iostream>
-#include <map>
+	if(arg[0] != '#')
+		return false;
+
+	for(size_t i = 0; i < arg.size(); i++)
+		if(arg[i] == ',')
+			return false;
+
+	if(arg.length() > ChannelConstants::MAX_NAME_SIZE)
+		return false;
+
+	return true;
+}
+
 #include <iterator>
+#include <map>
+#include <iostream>
 
 static void printChannels(std::map<std::string, Channel> channels)
 {
@@ -35,29 +44,77 @@ static void printChannels(std::map<std::string, Channel> channels)
 
 void Server::clientJoinChannel(Client&  client, const std::string& arg)
 {
-	_channels.at(arg).addClient(client);
+	_channels.at(normalizeString(arg)).addClient(client);
 }
 
 void Server::createNewChannel(Client&  client, const std::string& arg)
 {
-	_channels.insert(std::make_pair(arg, Channel(arg)));
-	_channels.at(arg).addOperator(client);
+	std::string normalized = normalizeString(arg);
+
+	_channels.insert(std::make_pair(normalized, Channel(arg)));
+	_channels.at(normalized).addOperator(client);
 }
 
 void Server::handleJoin(Client& client, const std::string& line)
 {
-
 	std::vector<std::string> args = extractMultipleArgs(line);
 
-	for(size_t i = 0; i < args.size(); i++)
+	if(args.empty())
+		return;
+
+	std::vector<std::string> targets = splitString(args[0], ',');
+	std::vector<std::string> keys;
+
+	if(args.size() > 1)
+		keys = splitString(args[1], ',');
+
+	for(size_t i = 0; i < targets.size(); i++)
 	{
-		if(_channels.find(args[i]) == _channels.end())
-			createNewChannel(client, args[i]);
+		std::string channelName = targets[i];
+		std::string key = "";
+
+		if(i < keys.size())
+			key = keys[i];
+
+
+		if(!isValidChannelName(channelName))
+		{
+			client.sendMessageToClient(createReply(Reply::ERR_NOSUCHCHANNEL, client.getNickname(), channelName));
+			continue;
+		}
+
+		Channel* channel;
+
+		if(!channelExists(channelName))
+		{
+			createNewChannel(client, channelName);
+			channel = getChannel(channelName);
+		}
 		else
-			clientJoinChannel(client, args[i]);
+		{
+			channel = getChannel(channelName);
+
+			if(channel->isMember(&client))
+				continue;
+
+			if(channel->isKeyProtected())
+			{
+				if(key != channel->getKey())
+				{
+					client.sendMessageToClient(createReply(Reply::ERR_BADCHANNELKEY, client.getNickname(), channelName));
+					continue;
+				}
+			}
+
+			clientJoinChannel(client, channelName);
+		}
 
 		printChannels(_channels);
 
-		client.sendMessageToClient(":ircserv " + client.getUsername() + " :joined " + args[i] + "\r\n");
+		channel->broadcast(client.getPrefix() + "JOIN :" + channelName);
+
+		client.sendMessageToClient(createReply(Reply::RPL_NAMREPLY, client.getNickname(), channelName, channel->getMemberNames()));
+
+		client.sendMessageToClient(createReply(Reply::RPL_ENDOFNAMES, client.getNickname(), channelName));
 	}
 }

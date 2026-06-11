@@ -21,6 +21,14 @@ static std::string buildReply(Reply::Code code, const std::string& client, const
 			msg += client + " " + p1 + " :" + p2;
 			break;
 
+		case(Reply::RPL_NAMREPLY):
+			msg += client + " " + p1 + " :End of /NAMES list";
+			break;
+
+		case(Reply::RPL_ENDOFNAMES):
+			msg += client + " " + p1 + " :End of /NAMES list";
+			break;
+
 		case(Reply::ERR_NOSUCHCHANNEL):
 			msg += client + " " + p1 + " :No such channel";
 			break;
@@ -35,6 +43,10 @@ static std::string buildReply(Reply::Code code, const std::string& client, const
 
 		case(Reply::ERR_NEEDMOREPARAMS):
 			msg += client + " " + p1 + " :Not enough parameters";
+			break;
+
+		case(Reply::ERR_BADCHANNELKEY):
+			msg += client + " " + p1 + " :Cannot join channel (+k)";
 			break;
 
 		case(Reply::ERR_CHANOPRIVSNEEDED):

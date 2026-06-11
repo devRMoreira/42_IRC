@@ -10,6 +10,8 @@ std::string convertToAddress(void *address, char *buffer, size_t size);
 std::string extractCmd(const std::string& line);
 std::string extractArg(const std::string& line);
 std::vector<std::string> extractMultipleArgs(const std::string& line);
+std::vector<std::string> splitString(const std::string& str, char delim);
+std::string normalizeString(const std::string& str);
 
 bool isNumeric(const std::string& str);
 

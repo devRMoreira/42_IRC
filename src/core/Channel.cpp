@@ -92,6 +92,17 @@ bool Channel::isMember(const std::string& nick) const
 	return false;
 }
 
+bool Channel::isMember(const Client* client) const
+{
+	for(size_t i = 0; i < _members.size(); i++)
+	{
+		if(_members[i].client == client)
+			return true;
+	}
+
+	return false;
+}
+
 bool Channel::isOperator(const std::string& nick) const
 {
 	for(size_t i = 0; i < _members.size(); i++)
@@ -101,6 +112,44 @@ bool Channel::isOperator(const std::string& nick) const
 	}
 
 	return false;
+}
+
+std::string Channel::getMemberNames() const
+{
+	std::string res;
+
+	for(size_t i = 0; i < _members.size(); i++)
+	{
+		if(_members[i].isOperator)
+			res += '@';
+
+		res += _members[i].client->getNickname();
+
+		if(i + 1 < _members.size())
+			res += ' ';
+	}
+
+	return res;
+}
+
+bool Channel::isKeyProtected() const
+{
+	return _key.empty();
+}
+
+bool Channel::isInviteOnly() const
+{
+	return _inviteOnly;
+}
+
+bool Channel::hasUserLimit() const
+{
+	return _userLimit > 0;
+}
+
+unsigned int Channel::getUserLimit() const
+{
+	return _userLimit;
 }
 
 void Channel::setKey(const std::string& str)
@@ -135,5 +184,10 @@ bool Channel::isTopicProtected() const
 std::string Channel::getTopic() const
 {
 	return _topic;
+}
+
+std::string Channel::getKey() const
+{
+	return _key;
 }
 

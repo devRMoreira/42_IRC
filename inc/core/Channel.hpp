@@ -20,12 +20,16 @@ class Channel
 		void removeClient(Client& client);
 
 		bool isMember(const std::string& nick) const;
-		bool isOperator(const std::string& nick) const;
-
-		bool isMember(const std::string& nick) const;
+		bool isMember(const Client* client) const;
 		bool isOperator(const std::string& nick) const;
 
 		bool isTopicProtected() const;
+
+		bool isKeyProtected() const;
+		bool isInviteOnly() const;
+
+		bool hasUserLimit() const;
+		unsigned int getUserLimit() const;
 
 		void setTopic(const std::string& str);
 		void setKey(const std::string& str);
@@ -35,12 +39,14 @@ class Channel
 		void setOperator(const std::string& nick, bool val);
 
 		std::string getTopic() const;
+		std::string getKey() const;
 
 		void broadcast(const std::string& msg);
 		void broadcast(Client& sender, const std::string& msg);
 		void debugChannel() const;
 
-		const std::string getName() const;
+		std::string getName() const;
+		std::string getMemberNames() const;
 
 	private:
 		struct Member
