@@ -22,7 +22,7 @@ static std::string buildReply(Reply::Code code, const std::string& client, const
 			break;
 
 		case(Reply::RPL_NAMREPLY):
-			msg += client + " " + p1 + " :End of /NAMES list";
+			msg += client + " " + p1;
 			break;
 
 		case(Reply::RPL_ENDOFNAMES):
