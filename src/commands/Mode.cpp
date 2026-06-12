@@ -10,7 +10,7 @@
 #include <cstdlib>
 #include <iostream>
 
-void static handleMode(Client& client, Channel& channel, std::string modeString, std::vector<std::string> params)
+void Server::handleMode(Client& client, Channel& channel, std::string modeString, std::vector<std::string> params)
 {
 	if(modeString.empty())
 		return ;
@@ -44,9 +44,10 @@ void static handleMode(Client& client, Channel& channel, std::string modeString,
 			if(paramIndex < params.size())
 			{
 				std::string nick = params[paramIndex++];
+				Client * target = getClient(nick);
 
-				if(channel.isMember(nick))
-					channel.setOperator(nick, adding);
+				if(target && channel.isMember(target))
+					channel.setOperator(target, adding);
 				else
 					client.sendMessage(createReply(Reply::ERR_USERNOTINCHANNEL, client.getNickname(), nick, channel.getName()));
 			}
@@ -93,7 +94,7 @@ void Server::parseMode(Client& client, const std::string& line)
 
 		if(channel && args.size() > 1)
 		{
-			if(channel->isOperator(client.getNickname()))
+			if(channel->isOperator(&client))
 			{
 				size_t i = 1;
 

@@ -413,7 +413,7 @@ void Server::handleInvite(Client& client, const std::string& line)
 			+ channelName + " :No such channel\r\n");
 		return ;
 	}
-	if (!channel->isMember(client.getNickname()) )
+	if (!channel->isMember(&client) )
 	{ // ERR_NOTONCHANNEL (442)
 		client.sendMessage(":ircserv " + client.getNickname() + " "
 			+ channelName + " 442 :You're not on that channel");
@@ -424,7 +424,7 @@ void Server::handleInvite(Client& client, const std::string& line)
 	// 	client.sendMessageToClient(":ircserv " + client.getNickname() + " "
 	// 		+ channelName + " 482 :You're not channel operator");
 	// }
-	if (channel->isMember(nickname) )
+	if (channel->isMember(invited) )
 	{ // ERR_USERONCHANNEL (443)
 		client.sendMessage(":ircserv " + client.getNickname() + " "
 			+ nickname + " " + channelName + " 443 :Is already on channel");
@@ -460,7 +460,7 @@ void Server::handleKick(Client& client, const std::string& line)
 			+ channelName + " :No such channel\r\n");
 		return ;
 	}
-	else if (!channel->isMember(nickname) )
+	else if (!channel->isMember(kicked) )
 	{ // ERR_USERNOTINCHANNEL (441)
 		client.sendMessage(":ircserv 441 " + client.getNickname() + " "
 		+ nickname + " " + channelName + " :They aren't on that channel");

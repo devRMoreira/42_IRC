@@ -54,6 +54,8 @@ class Server
 		void attemptRegistration(Client& client);
 		void handleJoin(Client& client, const std::string& line);
 		void parseMode(Client& client, const std::string& line);
+		void handleMode(Client& client, Channel& channel, std::string modeString, std::vector<std::string> params);
+
 		void handleTopic(Client& client, const std::string& line);
 
 		void createNewChannel(Client&  client, const std::string& arg);

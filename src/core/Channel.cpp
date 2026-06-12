@@ -47,14 +47,14 @@ void Channel::removeClient(Client& client)
 		_members.erase(it);
 }
 
-void Channel::setOperator(const std::string& nick, bool val)
+void Channel::setOperator(const Client* client, bool val)
 {
-	for(size_t i = 0; i < _members.size(); i++)
+	for (size_t i = 0; i < _members.size(); i++)
 	{
-		if(_members[i].client->getNickname() == nick)
+		if (_members[i].client == client)
 		{
 			_members[i].isOperator = val;
-			return ;
+			return;
 		}
 	}
 }
@@ -81,17 +81,6 @@ void Channel::broadcast(const std::string& msg)
 	}
 }
 
-bool Channel::isMember(const std::string& nick) const
-{
-	for(size_t i = 0; i < _members.size(); i++)
-	{
-		if(_members[i].client->getNickname() == nick)
-			return true;
-	}
-
-	return false;
-}
-
 bool Channel::isMember(const Client* client) const
 {
 	for(size_t i = 0; i < _members.size(); i++)
@@ -103,14 +92,13 @@ bool Channel::isMember(const Client* client) const
 	return false;
 }
 
-bool Channel::isOperator(const std::string& nick) const
+bool Channel::isOperator(const Client* client) const
 {
-	for(size_t i = 0; i < _members.size(); i++)
+	for (size_t i = 0; i < _members.size(); i++)
 	{
-		if(_members[i].client->getNickname() == nick)
+		if (_members[i].client == client)
 			return _members[i].isOperator;
 	}
-
 	return false;
 }
 

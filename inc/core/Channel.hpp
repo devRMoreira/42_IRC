@@ -6,48 +6,47 @@
 
 class Client;
 
-//TODO
-//Send RPL_TOPIC/NOTOPIC on user joining channel
-
 class Channel
 {
 	public:
 		Channel(const std::string& name);
 
-		void addOperator(Client& client);
-
 		void addClient(Client& client);
 		void removeClient(Client& client);
 
-		bool isMember(const std::string& nick) const;
+		bool isOperator(const Client* client) const;
+		void addOperator(Client& client);
+		void setOperator(const Client* client, bool val);
+
 		bool isMember(const Client* client) const;
-		bool isOperator(const std::string& nick) const;
 
 		bool isTopicProtected() const;
+		void setTopicProtected(const bool val);
+
+		std::string getTopic() const;
+		void setTopic(const std::string& str);
 
 		bool isKeyProtected() const;
+
 		bool isInviteOnly() const;
+		void setInviteOnly(const bool val);
 
 		bool hasUserLimit() const;
 		unsigned int getUserLimit() const;
-
-		void setTopic(const std::string& str);
-		void setKey(const std::string& str);
 		void setUserLimit(unsigned int n);
-		void setInviteOnly(const bool val);
-		void setTopicProtected(const bool val);
-		void setOperator(const std::string& nick, bool val);
 
-		std::string getTopic() const;
+
 		std::string getKey() const;
+		void setKey(const std::string& str);
+
+		std::string getName() const;
+
+		std::string getMemberNames() const;
 
 		void broadcast(const std::string& msg);
 		void broadcast(Client& sender, const std::string& msg);
+
 		void debugChannel() const;
-
-		std::string getName() const;
-		std::string getMemberNames() const;
-
 	private:
 		struct Member
 		{

@@ -54,7 +54,7 @@ static void changeTopic(Channel& channel, const Client& client, const std::vecto
 	else
 		topic = extractTopic(args);
 
-	if(channel.isTopicProtected() && !channel.isOperator(client.getNickname()))
+	if(channel.isTopicProtected() && !channel.isOperator(&client))
 		client.sendMessage(createReply(Reply::ERR_CHANOPRIVSNEEDED, client.getNickname(), channel.getName()));
 	else
 	{
@@ -87,7 +87,7 @@ void Server::handleTopic(Client& client, const std::string& line)
 
 		if(channel)
 		{
-			if(!channel->isMember(client.getNickname()))
+			if(!channel->isMember(&client))
 			{
 				client.sendMessage(createReply(Reply::ERR_NOTONCHANNEL, client.getNickname(), channel->getName()));
 			}
