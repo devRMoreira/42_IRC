@@ -184,12 +184,12 @@ void Server::handleLine(Client& client, const std::string& line)
 		handleUser(client, line);
 	else if(cmd == "DEBUG")
 	{
-		std::cout << "pass set: " << client.getPassAccepted() << "\n";
-		std::cout << "nick set: " << client.getNickBool() << "\n";
-		if (client.getNickBool())
+		std::cout << "pass set: " << client.isPassAccepted() << "\n";
+		std::cout << "nick set: " << client.hasNick() << "\n";
+		if (client.hasNick())
 			std::cout << "nick: " << client.getNickname() << "\n";
-		std::cout << "user set: " << client.getUserBool() << "\n";
-		if (client.getUserBool())
+		std::cout << "user set: " << client.hasUsername() << "\n";
+		if (client.hasUsername())
 		{
 			std::cout << "user: " << client.getUsername() << "\n";
 			std::cout << "real: " << client.getRealname() << "\n";
@@ -221,7 +221,6 @@ void Server::handleCap(Client& client, const std::string& line)
 
 	if(arg == "END")
 	{
-		std::cout << "END\n";
 		client.setCapEnd();
 	}
 	else
@@ -239,7 +238,7 @@ void Server::handlePass(Client& client, const std::string& line)
 		if(arg == _password)
 		{
 			client.setPassAccepted();
-			// std::cout << "password accepted\n";
+			attemptRegistration(client);
 		}
 		else
 		{
@@ -275,7 +274,7 @@ static bool areEqualCapitalized(const std::string& str1, const std::string& str2
 void Server::handleNick(Client& client, const std::string& line)
 {
 	// ERROR :Password required before NICK/USER
-	if (!client.getPassAccepted() )
+	if (!client.isPassAccepted() )
 	{
 		// sendErrorMessage(0, client, std::vector<std::string>());
 		return ;
@@ -305,7 +304,6 @@ void Server::handleNick(Client& client, const std::string& line)
 
 	if (!client.isRegistered()) //during registration, server silently accepts user’s request
 	{
-		client.setNickBool();
 		attemptRegistration(client);
 	}
 	else //used after registration, server returns a NICK message
@@ -315,7 +313,7 @@ void Server::handleNick(Client& client, const std::string& line)
 void Server::handleUser(Client& client, const std::string& line) // needs more checks
 {
 	// ERROR :Password required before NICK/USER
-	if (!client.getPassAccepted() )
+	if (!client.isPassAccepted() )
 	{
 		client.sendMessage(":ircserv * :Password required before NICK/USER\r\n");
 		return ;
@@ -331,7 +329,6 @@ void Server::handleUser(Client& client, const std::string& line) // needs more c
 	// std::cout << "client user: " << client.getUsername() << " real name : " << client.getRealname() << "\n";
 	if (!client.isRegistered())
 	{
-		client.setUserBool();
 		attemptRegistration(client);
 	}
 	else
@@ -343,11 +340,14 @@ void Server::handleUser(Client& client, const std::string& line) // needs more c
 
 void Server::attemptRegistration(Client& client)
 {
-	if (client.getPassAccepted() && client.getNickBool() && client.getUserBool() )
-	{
-		client.setRegistration();
-		//call function that prints successful registration messages
-	}
+	if(client.isRegistered())
+		return ;
+	if(!client.canRegister())
+		return ;
+
+	client.setRegistered(true);
+
+	client.sendMessage(createReply(Reply::RPL_WELCOME, client.getNickname(), client.getPrefix()));
 }
 
 Client* Server::getClient(const std::string& nick)

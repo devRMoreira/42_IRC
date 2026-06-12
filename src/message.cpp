@@ -2,17 +2,22 @@
 
 #include <string>
 #include <sstream>
+#include <iomanip>
 
 static std::string buildReply(Reply::Code code, const std::string& client, const std::string& p1, const std::string& p2)
 {
 	std::string msg = ":ircserv ";
 
 	std::ostringstream oss;
-	oss << code;
+	oss << std::setw(3) << std::setfill('0') << code;
 	msg += oss.str() + " ";
 
 	switch (code)
 	{
+		case(Reply::RPL_WELCOME):
+			msg += client + ":Welcome to the server" + p1;
+			break;
+
 		case(Reply::RPL_NOTOPIC):
 			msg += client + " " + p1 + " :No topic is set";
 			break;

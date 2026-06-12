@@ -12,9 +12,11 @@ class Client
 		void addToBuffer(std::string data);
 		std::vector<std::string> getLines();
 
+		bool hasNick() const;
 		void setNickname(const std::string& nickname);
 		std::string getNickname() const;
 
+		bool hasUsername() const;
 		void setUsername(const std::string& username);
 		std::string getUsername() const;
 
@@ -24,21 +26,17 @@ class Client
 		std::string getPrefix() const;
 
 		void setCapEnd();
-		bool getCapEnd() const;
+		bool isCapEnd() const;
 
 		void setPassAccepted();
-		bool getPassAccepted() const;
-
-		void setUserBool();
-		bool getUserBool() const;
-
-		void setNickBool();
-		bool getNickBool() const;
+		bool isPassAccepted() const;
 
 		int sendMessage(const std::string& msg) const;
 
+		bool canRegister() const;
 		bool isRegistered() const;
-		void setRegistration();
+		void setRegistered(bool val);
+
 
 
 	private:
@@ -49,8 +47,6 @@ class Client
 		std::string _realname;
 
 		bool _passAccepted;
-		bool _userIsSet;
-		bool _nickIsSet;
 		bool _capEnd;
 		bool _registered;
 

@@ -8,9 +8,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
-Client::Client(int fd) : _fd(fd), _passAccepted(false), _userIsSet(false), _nickIsSet(false)
+Client::Client(int fd) : _fd(fd), _passAccepted(false), _registered(false)
 {
-	(void) _registered;
 }
 
 void Client::addToBuffer(std::string data)
@@ -20,8 +19,6 @@ void Client::addToBuffer(std::string data)
 
 std::vector<std::string> Client::getLines()
 {
-	//* parse every \r\n line
-
 	std::vector<std::string> lines;
 
 	size_t lineSize = _buffer.find("\r\n");
@@ -82,31 +79,20 @@ void Client::setPassAccepted()
 	_passAccepted = true;
 }
 
-bool Client::getPassAccepted() const
+bool Client::isPassAccepted() const
 {
 	return _passAccepted;
 }
 
-void Client::setUserBool()
+bool Client::hasUsername() const
 {
-	_userIsSet = true;
+	return !_username.empty();
 }
 
-bool Client::getUserBool() const
+bool Client::hasNick() const
 {
-	return _userIsSet;
+	return !_nickname.empty();
 }
-
-void Client::setNickBool()
-{
-	_nickIsSet = true;
-}
-
-bool Client::getNickBool() const
-{
-	return _nickIsSet;
-}
-
 
 void Client::setNickname(const std::string& nickname)
 {
@@ -138,7 +124,7 @@ std::string Client::getRealname() const
 	return _realname;
 }
 
-bool Client::getCapEnd() const
+bool Client::isCapEnd() const
 {
 	return _capEnd;
 }
@@ -153,9 +139,14 @@ bool Client::isRegistered() const
 	return _registered;
 }
 
-void Client::setRegistration()
+void Client::setRegistered(bool val)
 {
-	_registered = true;
+	_registered = val;
+}
+
+bool Client::canRegister() const
+{
+	return _passAccepted && hasNick() && hasUsername();
 }
 
 std::string Client::getPrefix() const
