@@ -4,6 +4,9 @@
 #include <sstream>
 #include <iomanip>
 
+
+#include <iostream>
+
 static std::string buildReply(Reply::Code code, const std::string& client, const std::string& p1, const std::string& p2)
 {
 	std::string msg = ":ircserv ";
@@ -27,7 +30,7 @@ static std::string buildReply(Reply::Code code, const std::string& client, const
 			break;
 
 		case(Reply::RPL_NAMREPLY):
-			msg += client + " " + p1;
+			msg += client + " = " + p1 + " :" + p2;
 			break;
 
 		case(Reply::RPL_ENDOFNAMES):
@@ -71,6 +74,8 @@ static std::string buildReply(Reply::Code code, const std::string& client, const
 	}
 
 	msg += "\r\n";
+
+	std::cout << "\nNUM REPLY SENT\n" << msg << std::endl;
 
 	return msg;
 }

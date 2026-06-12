@@ -109,7 +109,7 @@ void Server::handleJoin(Client& client, const std::string& line)
 
 		printChannels(_channels);
 
-		channel->broadcast(client.getPrefix() + "JOIN :" + channelName);
+		channel->broadcast(client.getPrefix() + "JOIN " + channelName + "\r\n");
 
 		client.sendMessage(createReply(Reply::RPL_NAMREPLY, client.getNickname(), channelName, channel->getMemberNames()));
 
