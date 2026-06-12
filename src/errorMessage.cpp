@@ -25,7 +25,7 @@ void sendErrorMessage(int errCode, Client& client, std::vector<std::string> para
 
     line << " :" + errMsg;
 
-    client.sendMessageToClient(line.str());
+    client.sendMessage(line.str());
 }
 
 const std::string getErrorMessage(int errCode, unsigned int * paramCount)

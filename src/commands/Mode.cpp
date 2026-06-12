@@ -37,7 +37,7 @@ void static handleMode(Client& client, Channel& channel, std::string modeString,
 			else if(adding && paramIndex < params.size())
 				channel.setKey(params[paramIndex++]);
 			else
-				client.sendMessageToClient(createReply(Reply::ERR_NEEDMOREPARAMS, client.getNickname()));
+				client.sendMessage(createReply(Reply::ERR_NEEDMOREPARAMS, client.getNickname()));
 		}
 		else if(c == ModeFlag::OPERATOR)
 		{
@@ -48,10 +48,10 @@ void static handleMode(Client& client, Channel& channel, std::string modeString,
 				if(channel.isMember(nick))
 					channel.setOperator(nick, adding);
 				else
-					client.sendMessageToClient(createReply(Reply::ERR_USERNOTINCHANNEL, client.getNickname(), nick, channel.getName()));
+					client.sendMessage(createReply(Reply::ERR_USERNOTINCHANNEL, client.getNickname(), nick, channel.getName()));
 			}
 			else
-				client.sendMessageToClient(createReply(Reply::ERR_NEEDMOREPARAMS, client.getNickname()));
+				client.sendMessage(createReply(Reply::ERR_NEEDMOREPARAMS, client.getNickname()));
 
 		}
 		else if(c == ModeFlag::USER_LIMIT)
@@ -72,10 +72,10 @@ void static handleMode(Client& client, Channel& channel, std::string modeString,
 				}
 			}
 			else
-				client.sendMessageToClient(createReply(Reply::ERR_NEEDMOREPARAMS, client.getNickname()));
+				client.sendMessage(createReply(Reply::ERR_NEEDMOREPARAMS, client.getNickname()));
 		}
 		else
-			client.sendMessageToClient(createReply(Reply::ERR_UMODEUNKNOWNFLAG, client.getNickname()));
+			client.sendMessage(createReply(Reply::ERR_UMODEUNKNOWNFLAG, client.getNickname()));
 	}
 
 	channel.debugChannel();
@@ -115,7 +115,7 @@ void Server::parseMode(Client& client, const std::string& line)
 				handleMode(client, channel, modeString, params);
 			}
 			else
-				client.sendMessageToClient(createReply(Reply::ERR_CHANOPRIVSNEEDED, client.getNickname(), channel.getName()));
+				client.sendMessage(createReply(Reply::ERR_CHANOPRIVSNEEDED, client.getNickname(), channel.getName()));
 		}
 	}
 }

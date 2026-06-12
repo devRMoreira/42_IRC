@@ -206,7 +206,7 @@ void Server::handleLine(Client& client, const std::string& line)
 
 	else if(!client.isRegistered() )
 	{	// ERR_NOTREGISTERED (451)
-		client.sendMessageToClient(":ircserv 451 " + client.getNickname() + " :You have not registered\n");
+		client.sendMessage(":ircserv 451 " + client.getNickname() + " :You have not registered\n");
 		return ;
 	}
 	else if(cmd == "PRIVMSG")
@@ -233,7 +233,7 @@ void Server::handleCap(Client& client, const std::string& line)
 	}
 	else
 	{
-		client.sendMessageToClient(":ircserv CAP * LS :\r\n");
+		client.sendMessage(":ircserv CAP * LS :\r\n");
 	}
 }
 
@@ -253,13 +253,13 @@ void Server::handlePass(Client& client, const std::string& line)
 			// std::cout << "wrong! password is:\n'" << _password << "'\nyour input:\n'" << arg << "'\n";
 			// passAccepted should be set to false
 			// 464 ERR_PWDMISMATCH
-			client.sendMessageToClient(":ircserv 464 " + client.getNickname() + " :Password incorrect\r\n");
+			client.sendMessage(":ircserv 464 " + client.getNickname() + " :Password incorrect\r\n");
 		}
 	}
 	else
 	{
 	//	client.sendMessage() 462 ERR_ALREADYREGISTERED
-		client.sendMessageToClient(":ircserv 462 " + client.getNickname() + " :You may not reregister\r\n");
+		client.sendMessage(":ircserv 462 " + client.getNickname() + " :You may not reregister\r\n");
 	}
 }
 
@@ -297,11 +297,11 @@ void Server::handleNick(Client& client, const std::string& line)
 		{
 			//433 ERR_NICKNAMEINUSE - format "<client> <nick> :Nickname is already in use"c
 			if (client.isRegistered())
-				client.sendMessageToClient(":ircserv 433 "
+				client.sendMessage(":ircserv 433 "
 					+ client.getNickname() + arg + " :Nickname is already in use\r\n");
 			else
 				// * in place of current NICK
-				client.sendMessageToClient(":ircserv 433 * "
+				client.sendMessage(":ircserv 433 * "
 					+ arg + " :Nickname is already in use\r\n");
 			return ;
 		}
@@ -316,7 +316,7 @@ void Server::handleNick(Client& client, const std::string& line)
 		attemptRegistration(client);
 	}
 	else //used after registration, server returns a NICK message
-		client.sendMessageToClient("<prefix> NICK :" + client.getNickname() + "\r\n");
+		client.sendMessage("<prefix> NICK :" + client.getNickname() + "\r\n");
 }
 
 void Server::handleUser(Client& client, const std::string& line) // needs more checks
@@ -324,7 +324,7 @@ void Server::handleUser(Client& client, const std::string& line) // needs more c
 	// ERROR :Password required before NICK/USER
 	if (!client.getPassAccepted() )
 	{
-		client.sendMessageToClient(":ircserv * :Password required before NICK/USER\r\n");
+		client.sendMessage(":ircserv * :Password required before NICK/USER\r\n");
 		return ;
 	}
 
@@ -344,7 +344,7 @@ void Server::handleUser(Client& client, const std::string& line) // needs more c
 	else
 	{
 	//	client.sendMessage() 462 ERR_ALREADYREGISTERED
-		client.sendMessageToClient(":ircserv 462 " + client.getNickname() + " :You may not reregister\r\n");
+		client.sendMessage(":ircserv 462 " + client.getNickname() + " :You may not reregister\r\n");
 	}
 }
 
@@ -399,16 +399,16 @@ void Server::handlePrivMsg(Client& sender, const std::string& line)
 		if (findChannel(targetName))
 			_channels.at(targetName).broadcast(sender, msg);
 		else
-			sender.sendMessageToClient("<client> " + targetName + " :Cannot send to channel\r\n");
+			sender.sendMessage("<client> " + targetName + " :Cannot send to channel\r\n");
 		return ;
 	}
 
 	Client * targetUser = nickExists(targetName);
 	if (targetUser)
-		targetUser->sendMessageToClient(sender.getNickname() + "<prefix> PRIVMSG :" + msg + "\r\n");
+		targetUser->sendMessage(sender.getNickname() + "<prefix> PRIVMSG :" + msg + "\r\n");
 	else
 	{	//ERR_WASNOSUCHNICK (406)
-		sender.sendMessageToClient("<client> " + targetName + " :There was no such nickname\r\n");
+		sender.sendMessage("<client> " + targetName + " :There was no such nickname\r\n");
 	}
 }
 
@@ -422,20 +422,20 @@ void Server::handleInvite(Client& client, const std::string& line)
 	Client * invited = nickExists(nickname);
 	if (!invited)
 	{ // ERR_NOSUCHCHANNEL (403)
-		client.sendMessageToClient(":ircserv " + client.getNickname() + " "
+		client.sendMessage(":ircserv " + client.getNickname() + " "
 			+ channelName + " 403 :No such channel\r\n");
 			return ;
 	}
 	channel = findChannel(channelName);
 	if (!channel)
 	{ // ERR_NOSUCHCHANNEL (403)
-		client.sendMessageToClient(":ircserv 403 " + client.getNickname() + " "
+		client.sendMessage(":ircserv 403 " + client.getNickname() + " "
 			+ channelName + " :No such channel\r\n");
 		return ;
 	}
 	if (!channel->isMember(client.getNickname()) )
 	{ // ERR_NOTONCHANNEL (442)
-		client.sendMessageToClient(":ircserv " + client.getNickname() + " "
+		client.sendMessage(":ircserv " + client.getNickname() + " "
 			+ channelName + " 442 :You're not on that channel");
 		return ;
 	}
@@ -446,15 +446,15 @@ void Server::handleInvite(Client& client, const std::string& line)
 	// }
 	if (channel->isMember(nickname) )
 	{ // ERR_USERONCHANNEL (443)
-		client.sendMessageToClient(":ircserv " + client.getNickname() + " "
+		client.sendMessage(":ircserv " + client.getNickname() + " "
 			+ nickname + " " + channelName + " 443 :Is already on channel");
 		return ;
 	}
 
 	// SUCCESS
 	clientJoinChannel(*invited, channel->getName());
-	invited->sendMessageToClient(client.getNickname() + " INVITE " + nickname + " :" + channelName + "\r\n");
-	client.sendMessageToClient(":ircserv 341 " + client.getNickname()
+	invited->sendMessage(client.getNickname() + " INVITE " + nickname + " :" + channelName + "\r\n");
+	client.sendMessage(":ircserv 341 " + client.getNickname()
 		+ " " + (*invited).getNickname() + " " + channelName + "\r\n");
 }
 
@@ -469,20 +469,20 @@ void Server::handleKick(Client& client, const std::string& line)
 
 	if (!kicked)
 	{ // ERR_NOSUCHNICK (401)
-		client.sendMessageToClient(":ircserv 401 " + client.getNickname() + " "
+		client.sendMessage(":ircserv 401 " + client.getNickname() + " "
 			+ channelName + " :No such nick/channel\r\n");
 		return ;
 	}
 	channel = findChannel(channelName);
 	if (!channel)
 	{ // ERR_NOSUCHCHANNEL (403)
-		client.sendMessageToClient(":ircserv 403 " + client.getNickname() + " "
+		client.sendMessage(":ircserv 403 " + client.getNickname() + " "
 			+ channelName + " :No such channel\r\n");
 		return ;
 	}
 	else if (!channel->isMember(nickname) )
 	{ // ERR_USERNOTINCHANNEL (441)
-		client.sendMessageToClient(":ircserv 441 " + client.getNickname() + " "
+		client.sendMessage(":ircserv 441 " + client.getNickname() + " "
 		+ nickname + " " + channelName + " :They aren't on that channel");
 		return ;
 	}
@@ -494,7 +494,7 @@ void Server::handleKick(Client& client, const std::string& line)
 
 	//SUCESS
 	channel->broadcast(client, ":" + client.getNickname() + " KICK " + channelName + " " + nickname + " :optional comment");
-	client.sendMessageToClient(":" + client.getNickname() + " KICK " + channelName + " " + nickname + " :optional comment");
+	client.sendMessage(":" + client.getNickname() + " KICK " + channelName + " " + nickname + " :optional comment");
 	channel->removeClient(*kicked);
 }
 

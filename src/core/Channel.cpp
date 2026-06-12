@@ -69,7 +69,7 @@ void Channel::broadcast(Client& sender, const std::string& msg)
 	for(size_t i = 0; i < _members.size(); i++)
 	{
 		if(_members[i].client != &sender)
-			_members[i].client->sendMessageToClient(msg);
+			_members[i].client->sendMessage(msg);
 	}
 }
 
@@ -77,7 +77,7 @@ void Channel::broadcast(const std::string& msg)
 {
 	for(size_t i = 0; i < _members.size(); i++)
 	{
-		_members[i].client->sendMessageToClient(msg);
+		_members[i].client->sendMessage(msg);
 	}
 }
 

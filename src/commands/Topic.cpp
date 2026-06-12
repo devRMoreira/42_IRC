@@ -32,9 +32,9 @@ static std::string extractTopic(const std::vector<std::string>& args)
 static void topicReply(const Channel& channel, const Client& client)
 {
 	if(channel.getTopic().empty())
-		client.sendMessageToClient(createReply(Reply::RPL_NOTOPIC, client.getNickname(), channel.getName()));
+		client.sendMessage(createReply(Reply::RPL_NOTOPIC, client.getNickname(), channel.getName()));
 	else
-		client.sendMessageToClient(createReply(Reply::RPL_TOPIC, client.getNickname(), channel.getName(), channel.getTopic()));
+		client.sendMessage(createReply(Reply::RPL_TOPIC, client.getNickname(), channel.getName(), channel.getTopic()));
 }
 
 #include <iostream>
@@ -55,7 +55,7 @@ static void changeTopic(Channel& channel, const Client& client, const std::vecto
 		topic = extractTopic(args);
 
 	if(channel.isTopicProtected() && !channel.isOperator(client.getNickname()))
-		client.sendMessageToClient(createReply(Reply::ERR_CHANOPRIVSNEEDED, client.getNickname(), channel.getName()));
+		client.sendMessage(createReply(Reply::ERR_CHANOPRIVSNEEDED, client.getNickname(), channel.getName()));
 	else
 	{
 		channel.setTopic(topic);
@@ -89,7 +89,7 @@ void Server::handleTopic(Client& client, const std::string& line)
 
 			if(!channel.isMember(client.getNickname()))
 			{
-				client.sendMessageToClient(createReply(Reply::ERR_NOTONCHANNEL, client.getNickname(), channel.getName()));
+				client.sendMessage(createReply(Reply::ERR_NOTONCHANNEL, client.getNickname(), channel.getName()));
 			}
 			else if(args.size() == 1)
 			{
@@ -102,11 +102,11 @@ void Server::handleTopic(Client& client, const std::string& line)
 		}
 		else
 		{
-			client.sendMessageToClient(createReply(Reply::ERR_NOSUCHCHANNEL, client.getNickname(), channelName));
+			client.sendMessage(createReply(Reply::ERR_NOSUCHCHANNEL, client.getNickname(), channelName));
 		}
 	}
 	else
 	{
-		client.sendMessageToClient(createReply(Reply::ERR_NEEDMOREPARAMS, client.getNickname(), "TOPIC"));
+		client.sendMessage(createReply(Reply::ERR_NEEDMOREPARAMS, client.getNickname(), "TOPIC"));
 	}
 }

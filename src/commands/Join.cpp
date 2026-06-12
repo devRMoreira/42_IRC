@@ -79,7 +79,7 @@ void Server::handleJoin(Client& client, const std::string& line)
 
 		if(!isValidChannelName(channelName))
 		{
-			client.sendMessageToClient(createReply(Reply::ERR_NOSUCHCHANNEL, client.getNickname(), channelName));
+			client.sendMessage(createReply(Reply::ERR_NOSUCHCHANNEL, client.getNickname(), channelName));
 			continue;
 		}
 
@@ -101,7 +101,7 @@ void Server::handleJoin(Client& client, const std::string& line)
 			{
 				if(key != channel->getKey())
 				{
-					client.sendMessageToClient(createReply(Reply::ERR_BADCHANNELKEY, client.getNickname(), channelName));
+					client.sendMessage(createReply(Reply::ERR_BADCHANNELKEY, client.getNickname(), channelName));
 					continue;
 				}
 			}
@@ -113,8 +113,8 @@ void Server::handleJoin(Client& client, const std::string& line)
 
 		channel->broadcast(client.getPrefix() + "JOIN :" + channelName);
 
-		client.sendMessageToClient(createReply(Reply::RPL_NAMREPLY, client.getNickname(), channelName, channel->getMemberNames()));
+		client.sendMessage(createReply(Reply::RPL_NAMREPLY, client.getNickname(), channelName, channel->getMemberNames()));
 
-		client.sendMessageToClient(createReply(Reply::RPL_ENDOFNAMES, client.getNickname(), channelName));
+		client.sendMessage(createReply(Reply::RPL_ENDOFNAMES, client.getNickname(), channelName));
 	}
 }

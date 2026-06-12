@@ -58,7 +58,7 @@ static int sendData(int fd, char *buffer, int *len)
 		return 0;
 }
 
-int Client::sendMessageToClient(const std::string& msg) const
+int Client::sendMessage(const std::string& msg) const
 {
 	int	len = msg.size();
 	char buffer[len + 1];
