@@ -83,21 +83,21 @@ void Server::handleTopic(Client& client, const std::string& line)
 	{
 		std::string channelName = args[0];
 
-		if(channelExists(channelName))
-		{
-			Channel& channel = _channels.at(channelName);
+		Channel * channel = getChannel(channelName);
 
-			if(!channel.isMember(client.getNickname()))
+		if(channel)
+		{
+			if(!channel->isMember(client.getNickname()))
 			{
-				client.sendMessage(createReply(Reply::ERR_NOTONCHANNEL, client.getNickname(), channel.getName()));
+				client.sendMessage(createReply(Reply::ERR_NOTONCHANNEL, client.getNickname(), channel->getName()));
 			}
 			else if(args.size() == 1)
 			{
-				topicReply(channel, client);
+				topicReply(*channel, client);
 			}
 			else
 			{
-				changeTopic(channel, client, args);
+				changeTopic(*channel, client, args);
 			}
 		}
 		else

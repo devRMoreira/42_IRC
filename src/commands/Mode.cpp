@@ -89,11 +89,11 @@ void Server::parseMode(Client& client, const std::string& line)
 	{
 		std::string channelName = args[0];
 
-		if(channelExists(channelName) && args.size() > 1)
-		{
-			Channel& channel = _channels.at(channelName);
+		Channel* channel = getChannel(channelName);
 
-			if(channel.isOperator(client.getNickname()))
+		if(channel && args.size() > 1)
+		{
+			if(channel->isOperator(client.getNickname()))
 			{
 				size_t i = 1;
 
@@ -112,10 +112,10 @@ void Server::parseMode(Client& client, const std::string& line)
 					i++;
 				}
 
-				handleMode(client, channel, modeString, params);
+				handleMode(client, *channel, modeString, params);
 			}
 			else
-				client.sendMessage(createReply(Reply::ERR_CHANOPRIVSNEEDED, client.getNickname(), channel.getName()));
+				client.sendMessage(createReply(Reply::ERR_CHANOPRIVSNEEDED, client.getNickname(), channel->getName()));
 		}
 	}
 }

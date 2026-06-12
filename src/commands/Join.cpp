@@ -83,17 +83,15 @@ void Server::handleJoin(Client& client, const std::string& line)
 			continue;
 		}
 
-		Channel* channel;
+		Channel* channel = getChannel(channelName);
 
-		if(!channelExists(channelName))
+		if(!channel)
 		{
 			createNewChannel(client, channelName);
 			channel = getChannel(channelName);
 		}
 		else
 		{
-			channel = getChannel(channelName);
-
 			if(channel->isMember(&client))
 				continue;
 

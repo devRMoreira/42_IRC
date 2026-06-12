@@ -1,6 +1,7 @@
 #include "../../inc/core/Server.hpp"
 #include "../../inc/core/Client.hpp"
 #include "../../inc/constants.hpp"
+#include "../../inc/message.hpp"
 #include "../../inc/irc.hpp"
 
 #include <arpa/inet.h>
@@ -181,13 +182,6 @@ void Server::handleLine(Client& client, const std::string& line)
 		handleNick(client, line);
 	else if(cmd == "USER")
 		handleUser(client, line);
-	else if(cmd == "JOIN")
-		handleJoin(client, line);
-	else if(cmd == "MODE")
-		parseMode(client, line);
-	else if(cmd == "TOPIC")
-		handleTopic(client, line);
-
 	else if(cmd == "DEBUG")
 	{
 		std::cout << "pass set: " << client.getPassAccepted() << "\n";
@@ -203,12 +197,14 @@ void Server::handleLine(Client& client, const std::string& line)
 		std::cout << "is registered?: " << client.isRegistered() << "\n";
 	}
 	//QUIT is the only other non-registered command
-
-	else if(!client.isRegistered() )
-	{	// ERR_NOTREGISTERED (451)
-		client.sendMessage(":ircserv 451 " + client.getNickname() + " :You have not registered\n");
-		return ;
-	}
+	else if(!client.isRegistered())
+		client.sendMessage(createReply(Reply::ERR_NOTREGISTERED, client.getNickname()));
+	else if(cmd == "JOIN")
+		handleJoin(client, line);
+	else if(cmd == "MODE")
+		parseMode(client, line);
+	else if(cmd == "TOPIC")
+		handleTopic(client, line);
 	else if(cmd == "PRIVMSG")
 		handlePrivMsg(client, line);
 	else if(cmd == "JOIN")
@@ -217,9 +213,6 @@ void Server::handleLine(Client& client, const std::string& line)
 		handleInvite(client, line);
 	else if(cmd == "KICK")
 		handleKick(client, line);
-
-	//!check for registration for other cmds
-	//if(!client.registered)
 }
 
 void Server::handleCap(Client& client, const std::string& line)
@@ -357,20 +350,7 @@ void Server::attemptRegistration(Client& client)
 	}
 }
 
-Channel* Server::findChannel(const std::string& channel)
-{
-	std::map<std::string, Channel>::iterator it;
-	for (it = _channels.begin(); it != _channels.end(); it++)
-	{
-		if (areEqualCapitalized(channel, it->second.getName()) )
-		{
-			return &it->second;
-		}
-	}
-	return NULL;
-}
-
-Client* Server::nickExists(const std::string& nick)
+Client* Server::getClient(const std::string& nick)
 {
 	std::map<int, Client*>::iterator it;
 	for (it = _clients.begin(); it != _clients.end(); it++)
@@ -395,15 +375,15 @@ void Server::handlePrivMsg(Client& sender, const std::string& line)
 
 	if (chanTypes.find_first_of(targetName[0]) != std::string::npos) // if targetName's leading char is #/&
 	{
-		// Channel * targetChannel = channelExists(targetName);
-		if (findChannel(targetName))
-			_channels.at(targetName).broadcast(sender, msg);
+		Channel * channel = getChannel(targetName);
+		if (channel)
+			channel->broadcast(sender, msg);
 		else
 			sender.sendMessage("<client> " + targetName + " :Cannot send to channel\r\n");
 		return ;
 	}
 
-	Client * targetUser = nickExists(targetName);
+	Client * targetUser = getClient(targetName);
 	if (targetUser)
 		targetUser->sendMessage(sender.getNickname() + "<prefix> PRIVMSG :" + msg + "\r\n");
 	else
@@ -419,14 +399,14 @@ void Server::handleInvite(Client& client, const std::string& line)
 	std::string channelName = arg.substr(arg.find(' ') + 1);
 
 	Channel * channel = NULL;
-	Client * invited = nickExists(nickname);
+	Client * invited = getClient(nickname);
 	if (!invited)
 	{ // ERR_NOSUCHCHANNEL (403)
 		client.sendMessage(":ircserv " + client.getNickname() + " "
 			+ channelName + " 403 :No such channel\r\n");
 			return ;
 	}
-	channel = findChannel(channelName);
+	channel = getChannel(channelName);
 	if (!channel)
 	{ // ERR_NOSUCHCHANNEL (403)
 		client.sendMessage(":ircserv 403 " + client.getNickname() + " "
@@ -465,7 +445,7 @@ void Server::handleKick(Client& client, const std::string& line)
 	std::string nickname = arg.substr(arg.find(' ') + 1);
 
 	Channel * channel = NULL;
-	Client * kicked = nickExists(nickname);
+	Client * kicked = getClient(nickname);
 
 	if (!kicked)
 	{ // ERR_NOSUCHNICK (401)
@@ -473,7 +453,7 @@ void Server::handleKick(Client& client, const std::string& line)
 			+ channelName + " :No such nick/channel\r\n");
 		return ;
 	}
-	channel = findChannel(channelName);
+	channel = getChannel(channelName);
 	if (!channel)
 	{ // ERR_NOSUCHCHANNEL (403)
 		client.sendMessage(":ircserv 403 " + client.getNickname() + " "
@@ -507,9 +487,4 @@ Channel* Server::getChannel(const std::string& name)
         return NULL;
 
     return &it->second;
-}
-
-bool Server::channelExists(const std::string& name)
-{
-	return _channels.find(normalizeString(name))!= _channels.end();
 }

@@ -27,7 +27,6 @@ class Server
 		std::string _password;
 		std::string _port;
 
-		//TODO change client to non pointer, it doesnt make sense
 		std::map<int, Client*> _clients;
 
 		std::map<std::string, Channel> _channels;
@@ -50,8 +49,7 @@ class Server
 		void handleInvite(Client& client, const std::string& line);
 		void handleKick(Client& client, const std::string& line);
 
-		Client* nickExists(const std::string& nick);
-		Channel* findChannel(const std::string& channel);
+
 
 		void attemptRegistration(Client& client);
 		void handleJoin(Client& client, const std::string& line);
@@ -62,12 +60,9 @@ class Server
 		void clientJoinChannel(Client&  client, const std::string& arg);
 
 		const std::string errorMessage(int errCode);
-		bool channelExists(const std::string& name);
 
 		Channel* getChannel(const std::string& name);
-;
-
-
+		Client* getClient(const std::string& nick);
 };
 
 
