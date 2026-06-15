@@ -33,6 +33,10 @@ static std::string buildReply(Reply::Code code, const std::string& client, const
 			msg += client + " " + p1 + " :" + p2;
 			break;
 
+		case(Reply::RPL_INVITING):
+			msg += client + " " + p1 + " " + p2;
+			break;
+
 		case(Reply::RPL_NAMREPLY):
 			msg += client + " = " + p1 + " :" + p2;
 			break;
@@ -41,25 +45,63 @@ static std::string buildReply(Reply::Code code, const std::string& client, const
 			msg += client + " " + p1 + " :End of /NAMES list";
 			break;
 
+		case(Reply::ERR_NOSUCHNICK):
+			msg += client + " " + p1 + " :No such nick/channel";
+			break;
+
 		case(Reply::ERR_NOSUCHCHANNEL):
 			msg += client + " " + p1 + " :No such channel";
+			break;
+
+		case(Reply::ERR_NOTEXTTOSEND):
+			msg += client + " " + " :No text to send";
+			break;
+
+		case(Reply::ERR_UNKNOWNCOMMAND):
+			msg += client + " " + p1 + " :Unknown command";
+			break;
+
+		case(Reply::ERR_NONICKNAMEGIVEN):
+			msg += client + " :No nickname given";
+			break;
+
+		case(Reply::ERR_ERRONEUSNICKNAME):
+			msg += client + " " + p1 + " :Erroneous nickname";
+			break;
+
+		case(Reply::ERR_NICKNAMEINUSE):
+			msg += client + " " + p1 + " :Nickname is already in use";
 			break;
 
 		case(Reply::ERR_USERNOTINCHANNEL):
 			msg += client + " " + p1 + " " + p2 + " :They aren't on that channel";
 			break;
 
-		case(Reply::ERR_NOTREGISTERED):
-			msg += client + ":You have not registered";
-			break;
-
 		case(Reply::ERR_NOTONCHANNEL):
 			msg += client + " " + p1 + " :You're not on that channel";
+			break;
+
+		case(Reply::ERR_USERONCHANNEL):
+			msg += client + " " + p1 + " " + p2 + " :is already on channel";
+
+		case(Reply::ERR_NOTREGISTERED):
+			msg += client + ":You have not registered";
 			break;
 
 		case(Reply::ERR_NEEDMOREPARAMS):
 			msg += client + " " + p1 + " :Not enough parameters";
 			break;
+
+		case(Reply::ERR_ALREADYREGISTRED):
+			msg += client + " :You may not reregister";
+			break;
+
+		case(Reply::ERR_PASSWDMISMATCH):
+			msg += "* :Password incorrect";
+			break;
+
+		case(Reply::ERR_INVITEONLYCHAN):
+			msg += client + " " + p1 + " :Cannot join channel (+i)";
 
 		case(Reply::ERR_BADCHANNELKEY):
 			msg += client + " " + p1 + " :Cannot join channel (+k)";

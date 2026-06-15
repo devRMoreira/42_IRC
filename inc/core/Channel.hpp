@@ -37,7 +37,6 @@ class Channel
 		unsigned int getUserLimit() const;
 		void setUserLimit(unsigned int n);
 
-
 		std::string getKey() const;
 		void setKey(const std::string& str);
 
