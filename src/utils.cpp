@@ -105,6 +105,21 @@ std::string intToString(int n)
 	return res;
 }
 
+bool areEqualCapitalized(const std::string& str1, const std::string& str2)
+{
+	if (str1.size() != str2.size())
+		return false;
+	else
+	{
+		for (size_t i = 0; i < str1.size(); i++)
+		{
+			if (toupper(str1[i]) != toupper(str2[i]))
+				return(false);
+		}
+	}
+	return true;
+}
+
 int initListener(const char* port)
 {
 	int listenerFd;

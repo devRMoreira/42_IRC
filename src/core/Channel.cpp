@@ -5,7 +5,7 @@
 #include <iostream>
 #include <algorithm>
 
-Channel::Channel(const std::string& name) : _name(name), _userLimit(0), _inviteOnly(false), _topicProtected(false), _topic(""), _key("")
+Channel::Channel(const std::string& name) : _name(name), _topic(""), _key(""), _userLimit(0), _inviteOnly(false), _topicProtected(false)
 {
 }
 

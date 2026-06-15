@@ -241,34 +241,16 @@ void Server::handlePass(Client& client, const std::string& line)
 			attemptRegistration(client);
 		}
 		else
-		{
-			// std::cout << "wrong! password is:\n'" << _password << "'\nyour input:\n'" << arg << "'\n";
-			// passAccepted should be set to false
-			// 464 ERR_PWDMISMATCH
-			client.sendMessage(createReply(Reply::ERR_PASSWDMISMATCH, client));
-			client.sendMessage(":ircserv 464 " + client.getNickname() + " :Password incorrect\r\n");
+		{ // 464 ERR_PWDMISMATCH
+			client.sendMessage(createReply(Reply::ERR_PASSWDMISMATCH, ""));
+			// client.sendMessage(":ircserv 464 " + client.getNickname() + " :Password incorrect\r\n");
 		}
 	}
 	else
 	{
-	//	client.sendMessage() 462 ERR_ALREADYREGISTERED
-		client.sendMessage(":ircserv 462 " + client.getNickname() + " :You may not reregister\r\n");
+	//	462 ERR_ALREADYREGISTERED
+		client.sendMessage(createReply(Reply::ERR_ALREADYREGISTERED, client.getNickname()));
 	}
-}
-
-static bool areEqualCapitalized(const std::string& str1, const std::string& str2)
-{
-	if (str1.size() != str2.size())
-		return false;
-	else
-	{
-		for (size_t i = 0; i < str1.size(); i++)
-		{
-			if (toupper(str1[i]) != toupper(str2[i]))
-				return(false);
-		}
-	}
-	return true;
 }
 
 //how to handle whitespace at the edges? AKA 'bingus' vs 'bingus '
@@ -379,18 +361,16 @@ void Server::handlePrivMsg(Client& sender, const std::string& line)
 		Channel * channel = getChannel(targetName);
 		if (channel)
 			channel->broadcast(sender, msg);
-		else
-			sender.sendMessage("<client> " + targetName + " :Cannot send to channel\r\n");
+		else // 403
+			sender.sendMessage(createReply(Reply::ERR_NOSUCHCHANNEL, sender.getNickname(), targetName) );
 		return ;
 	}
 
 	Client * targetUser = getClient(targetName);
 	if (targetUser)
-		targetUser->sendMessage(sender.getNickname() + "<prefix> PRIVMSG :" + msg + "\r\n");
+		targetUser->sendMessage(sender.getNickname() + "<prefix> PRIVMSG :" + msg + "\r\n"); // CHANGE
 	else
-	{	//ERR_WASNOSUCHNICK (406)
-		sender.sendMessage("<client> " + targetName + " :There was no such nickname\r\n");
-	}
+		sender.sendMessage(createReply(Reply::ERR_NOSUCHNICK, sender.getNickname(), targetName) );
 }
 
 void Server::handleInvite(Client& client, const std::string& line)

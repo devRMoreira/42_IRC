@@ -13,6 +13,8 @@ std::vector<std::string> extractMultipleArgs(const std::string& line);
 std::vector<std::string> splitString(const std::string& str, char delim);
 std::string normalizeString(const std::string& str);
 
+bool areEqualCapitalized(const std::string& str1, const std::string& str2);
+
 bool isNumeric(const std::string& str);
 std::string intToString(int n);
 

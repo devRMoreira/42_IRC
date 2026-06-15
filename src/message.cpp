@@ -92,7 +92,7 @@ static std::string buildReply(Reply::Code code, const std::string& client, const
 			msg += client + " " + p1 + " :Not enough parameters";
 			break;
 
-		case(Reply::ERR_ALREADYREGISTRED):
+		case(Reply::ERR_ALREADYREGISTERED): 
 			msg += client + " :You may not reregister";
 			break;
 
