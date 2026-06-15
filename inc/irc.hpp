@@ -14,5 +14,6 @@ std::vector<std::string> splitString(const std::string& str, char delim);
 std::string normalizeString(const std::string& str);
 
 bool isNumeric(const std::string& str);
+std::string intToString(int n);
 
 #endif

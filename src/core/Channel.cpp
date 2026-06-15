@@ -1,7 +1,8 @@
 #include "../../inc/core/Channel.hpp"
 #include "../../inc/core/Client.hpp"
-#include <iostream>
+#include "../../inc/irc.hpp"
 
+#include <iostream>
 #include <algorithm>
 
 Channel::Channel(const std::string& name) : _name(name)
@@ -118,6 +119,40 @@ std::string Channel::getMemberNames() const
 	}
 
 	return res;
+}
+
+std::string Channel::getModeString() const
+{
+	std::string flags;
+
+	std::string params;
+
+	if(_inviteOnly || _topicProtected || !_key.empty() || _userLimit != 0)
+		flags += '+';
+
+	if(_inviteOnly)
+		flags += 'i';
+
+	if(!_key.empty())
+	{
+		flags += 'k';
+		params += "secret";
+	}
+
+	if(_userLimit != 0)
+	{
+		flags += 'l';
+
+		if(!params.empty())
+			params += " ";
+
+		params += intToString(_userLimit);
+	}
+
+	if(_topicProtected)
+		flags += 't';
+
+	return flags + (params.empty() ? "" : " " + params);
 }
 
 bool Channel::isKeyProtected() const

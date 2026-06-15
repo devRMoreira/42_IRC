@@ -21,6 +21,10 @@ static std::string buildReply(Reply::Code code, const std::string& client, const
 			msg += client + " :Welcome to the server" + p1;
 			break;
 
+		case(Reply::RPL_CHANNELMODEIS):
+			msg += client + " " + p1 + " " + p2;
+			break;
+
 		case(Reply::RPL_NOTOPIC):
 			msg += client + " " + p1 + " :No topic is set";
 			break;

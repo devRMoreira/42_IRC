@@ -41,6 +41,7 @@ namespace Reply
 	enum Code
 	{
 		RPL_WELCOME = 1,
+		RPL_CHANNELMODEIS = 324,
 		RPL_NOTOPIC = 331,
 		RPL_TOPIC = 332,
 		RPL_NAMREPLY = 353,

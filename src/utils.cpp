@@ -89,6 +89,22 @@ bool isNumeric(const std::string& str)
 	return true;
 }
 
+std::string intToString(int n)
+{
+	if (n == 0)
+		return "0";
+
+	std::string res;
+
+	while (n > 0)
+	{
+		res.insert(res.begin(), '0' + (n % 10));
+		n /= 10;
+	}
+
+	return res;
+}
+
 int initListener(const char* port)
 {
 	int listenerFd;

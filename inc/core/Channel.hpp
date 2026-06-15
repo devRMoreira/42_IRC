@@ -20,6 +20,8 @@ class Channel
 
 		bool isMember(const Client* client) const;
 
+		std::string getModeString() const;
+
 		bool isTopicProtected() const;
 		void setTopicProtected(const bool val);
 
