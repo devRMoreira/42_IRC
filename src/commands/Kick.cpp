@@ -5,13 +5,14 @@
 #include "../../inc/constants.hpp"
 #include "../../inc/message.hpp"
 
+//MISSING BETTER PARSING/REASON/: USAGE
+
 void Server::handleKick(Client& client, const std::string& line)
 {
 	std::string arg = extractArg(line);
 	std::string channelName = arg.substr(0, arg.find(' '));
 	std::string nickname = arg.substr(arg.find(' ') + 1);
 
-	//MISSING REASON
 	std::string reason = "reason";
 
 	Channel * channel = NULL;

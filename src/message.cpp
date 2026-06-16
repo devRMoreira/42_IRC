@@ -18,7 +18,7 @@ static std::string buildReply(Reply::Code code, const std::string& client, const
 	switch (code)
 	{
 		case(Reply::RPL_WELCOME):
-			msg += client + " :Welcome to the server" + p1;
+			msg += client + " :Welcome to the server, " + p1;
 			break;
 
 		case(Reply::RPL_CHANNELMODEIS):

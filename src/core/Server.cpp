@@ -227,18 +227,6 @@ void Server::handleCap(Client& client, const std::string& line)
 	}
 }
 
-void Server::attemptRegistration(Client& client)
-{
-	if(client.isRegistered())
-		return ;
-	if(!client.canRegister())
-		return ;
-
-	client.setRegistered(true);
-
-	client.sendMessage(createReply(Reply::RPL_WELCOME, client.getNickname(), client.getPrefix()));
-}
-
 Client* Server::getClient(const std::string& nick)
 {
 	std::map<int, Client*>::iterator it;

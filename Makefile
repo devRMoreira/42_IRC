@@ -11,11 +11,9 @@ SRC = src/main.cpp \
 	  src/commands/Join.cpp \
 	  src/commands/Kick.cpp \
 	  src/commands/Mode.cpp \
-	  src/commands/Nick.cpp \
-	  src/commands/Pass.cpp \
 	  src/commands/Privmsg.cpp \
+	  src/commands/Registration.cpp \
 	  src/commands/Topic.cpp \
-	  src/commands/User.cpp \
 	  src/core/Channel.cpp \
 	  src/core/Client.cpp \
 	  src/core/Server.cpp \

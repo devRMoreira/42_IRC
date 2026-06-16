@@ -5,6 +5,10 @@
 #include "../../inc/constants.hpp"
 #include "../../inc/message.hpp"
 
+#include <iostream>
+
+//MISSING BETTER PARSING/ : USAGE
+
 void Server::handlePrivMsg(Client& sender, const std::string& line)
 {
 	std::string arg = extractArg(line);
@@ -15,7 +19,11 @@ void Server::handlePrivMsg(Client& sender, const std::string& line)
 	{
 		Channel * channel = getChannel(targetName);
 		if (channel)
-			channel->broadcast(sender, msg);
+        {
+            std::cout << "broadly casting\n";
+			channel->broadcast(sender, sender.getPrefix() + "PRIVMSG " + targetName
+            + " :" + msg + "\r\n");
+        }
 		else // 403
 			sender.sendMessage(createReply(Reply::ERR_NOSUCHCHANNEL, sender.getNickname(), targetName) );
 		return ;
@@ -23,7 +31,8 @@ void Server::handlePrivMsg(Client& sender, const std::string& line)
 
 	Client * targetUser = getClient(targetName);
 	if (targetUser)
-		targetUser->sendMessage(sender.getNickname() + "<prefix> PRIVMSG :" + msg + "\r\n"); // CHANGE
+		targetUser->sendMessage(sender.getPrefix() + "PRIVMSG " + targetName
+            + " :" + msg + "\r\n");
 	else
 		sender.sendMessage(createReply(Reply::ERR_NOSUCHNICK, sender.getNickname(), targetName) );
 }
