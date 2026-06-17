@@ -14,6 +14,10 @@ class Channel
 		void addClient(Client& client);
 		void removeClient(Client& client);
 
+		void addClientInvite(const Client* client);
+		void removeClientInvite(const Client* client);
+		bool isClientInvited(const Client* client);
+
 		bool isOperator(const Client* client) const;
 		void addOperator(Client& client);
 		void setOperator(const Client* client, bool val);
@@ -65,6 +69,7 @@ class Channel
 		bool _topicProtected;
 
 		std::vector<Member> _members;
+		std::vector<const Client *> _invitedClients;
 
 };
 

@@ -95,6 +95,12 @@ void Server::handleJoin(Client& client, const std::string& line)
 			if(channel->isMember(&client))
 				continue;
 
+			if(channel->isInviteOnly() && !channel->isClientInvited(&client))
+			{
+				client.sendMessage(createReply(Reply::ERR_INVITEONLYCHAN, client.getNickname(), channelName));
+				continue;
+			}
+
 			if(channel->isKeyProtected())
 			{
 				if(key != channel->getKey())

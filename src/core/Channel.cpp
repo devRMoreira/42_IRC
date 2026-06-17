@@ -34,6 +34,7 @@ void Channel::addOperator(Client& client)
 void Channel::addClient(Client& client)
 {
 	_members.push_back(Member(&client, false));
+	removeClientInvite(&client);
 }
 
 void Channel::removeClient(Client& client)
@@ -153,6 +154,35 @@ std::string Channel::getModeString() const
 		flags += 't';
 
 	return flags + (params.empty() ? "" : " " + params);
+}
+
+void Channel::addClientInvite(const Client* client)
+{
+	_invitedClients.push_back(client);
+}
+
+void Channel::removeClientInvite(const Client* client)
+{
+	for(size_t i = 0; i < _invitedClients.size(); i++)
+	{
+		if(_invitedClients[i] == client)
+		{
+			_invitedClients.erase(_invitedClients.begin() + i);
+			return;
+		}
+	}
+
+}
+
+bool Channel::isClientInvited(const Client* client)
+{
+	for(size_t i = 0; i < _invitedClients.size(); i++)
+	{
+		if(_invitedClients[i] == client)
+			return true;
+	}
+
+	return false;
 }
 
 bool Channel::isKeyProtected() const
