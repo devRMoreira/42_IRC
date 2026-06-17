@@ -6,7 +6,6 @@ NAME = ircserv
 SRC = src/main.cpp \
 	  src/message.cpp \
 	  src/utils.cpp \
-	  src/errorMessage.cpp \
 	  src/commands/Invite.cpp \
 	  src/commands/Join.cpp \
 	  src/commands/Kick.cpp \

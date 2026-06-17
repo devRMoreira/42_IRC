@@ -33,8 +33,7 @@ void Server::handlePass(Client& client, const std::string& line)
 		}
 	}
 	else
-	{
-	//	462 ERR_ALREADYREGISTERED
+	{ // 462 ERR_ALREADYREGISTERED
 		client.sendMessage(createReply(Reply::ERR_ALREADYREGISTERED, client.getNickname()));
 	}
 }
@@ -61,6 +60,7 @@ void Server::handleNick(Client& client, const std::string& line)
 			return ;
 		}
 	}
+
 	if (arg[0] == '#' || arg[0] == ':')
 	{ // 432 ERR_ERRONEUSNICKNAME
 		client.sendMessage(createReply(Reply::ERR_ERRONEUSNICKNAME, client.getNickname(), arg) );
@@ -70,9 +70,7 @@ void Server::handleNick(Client& client, const std::string& line)
 	client.setNickname(arg);
 
 	if (!client.isRegistered())
-	{
 		attemptRegistration(client);
-	}
 	else
 		client.sendMessage(":ircserv NICK :" + client.getNickname() + "\r\n");
 }
@@ -92,13 +90,8 @@ void Server::handleUser(Client& client, const std::string& line) // needs more c
 	client.setUsername(username);
 	client.setRealname(realname);
 
-	// std::cout << "client user: " << client.getUsername() << " real name : " << client.getRealname() << "\n";
 	if (!client.isRegistered())
-	{
 		attemptRegistration(client);
-	}
-	else
-	{ // 462 ERR_ALREADYREGISTERED
+	else // 462 ERR_ALREADYREGISTERED
 		client.sendMessage(createReply(Reply::ERR_ALREADYREGISTERED, client.getNickname()) );
-	}
 }

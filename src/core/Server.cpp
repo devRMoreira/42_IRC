@@ -53,7 +53,6 @@ void Server::run()
 				handleNewConnection();
 			else
 				handleClientData(i);
-
 		}
 	}
 }
@@ -138,7 +137,6 @@ void Server::handleClientData(int& index)
 	int senderFd = _pfds.at(index).fd;
 	int bytesReceived = recv(senderFd, buffer, sizeof buffer, 0);
 
-
 	if(bytesReceived <= 0)
 	{
 		close(senderFd);
@@ -167,7 +165,6 @@ void Server::handleClientData(int& index)
 	}
 }
 
-
 void Server::handleLine(Client& client, const std::string& line)
 {
 	std::string cmd = extractCmd(line);
@@ -182,23 +179,10 @@ void Server::handleLine(Client& client, const std::string& line)
 		handleNick(client, line);
 	else if(cmd == "USER")
 		handleUser(client, line);
-	else if(cmd == "DEBUG")
-	{
-		std::cout << "pass set: " << client.isPassAccepted() << "\n";
-		std::cout << "nick set: " << client.hasNick() << "\n";
-		if (client.hasNick())
-			std::cout << "nick: " << client.getNickname() << "\n";
-		std::cout << "user set: " << client.hasUsername() << "\n";
-		if (client.hasUsername())
-		{
-			std::cout << "user: " << client.getUsername() << "\n";
-			std::cout << "real: " << client.getRealname() << "\n";
-		}
-		std::cout << "is registered?: " << client.isRegistered() << "\n";
-	}
-	//QUIT is the only other non-registered command
+	
 	else if(!client.isRegistered())
 		client.sendMessage(createReply(Reply::ERR_NOTREGISTERED, client.getNickname()));
+	
 	else if(cmd == "JOIN")
 		handleJoin(client, line);
 	else if(cmd == "MODE")
