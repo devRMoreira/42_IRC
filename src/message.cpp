@@ -61,6 +61,10 @@ static std::string buildReply(Reply::Code code, const std::string& client, const
 			msg += client + " " + p1 + " :Not enough parameters";
 			break;
 
+		case(Reply::ERR_INVITEONLYCHAN):
+			msg += client + " " + p1 + " :Cannot join channel (+k)";
+			break;
+
 		case(Reply::ERR_BADCHANNELKEY):
 			msg += client + " " + p1 + " :Cannot join channel (+k)";
 			break;
