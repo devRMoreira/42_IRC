@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <cctype>
+#include <sstream>
 
 std::string extractCmd(const std::string& line)
 {
@@ -190,4 +191,43 @@ std::string convertToAddress(void *address, char *buffer, size_t size)
 
 	inet_ntop(addressStorage->ss_family, src, buffer, size);
 	return std::string(buffer);
+}
+
+std::vector<std::string> getArgsWithColon(const std::string& line)
+{
+	std::vector<std::string> args;
+	std::stringstream ss(line);
+	std::string arg;
+
+	while(ss >> arg) // already skips leading whitespace
+	{
+		if (arg[0] != ':')
+			args.push_back(arg);
+		else
+		{
+			if (arg.size() > 1)
+			{
+				std::string lastArg = arg.substr(1);
+				std::string rest;
+				std::getline(ss, rest);
+				lastArg += rest;
+				args.push_back(lastArg);
+			}
+			break;
+		}	
+	}
+
+	return args;
+}
+
+std::vector<std::string> getArgs(const std::string& line)
+{
+	std::vector<std::string> args;
+	std::stringstream ss(line);
+	std::string arg;
+
+	while(ss >> arg)
+		args.push_back(arg);
+
+	return args;
 }

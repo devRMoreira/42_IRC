@@ -47,6 +47,7 @@ void Server::handleNick(Client& client, const std::string& line)
 	}
 
 	std::string arg = extractArg(line);
+	arg = getArgs(arg)[0];
 
 	std::map<int, Client*>::iterator it;
 	for (it = _clients.begin(); it != _clients.end(); it++)
@@ -83,12 +84,17 @@ void Server::handleUser(Client& client, const std::string& line) // needs more c
 		return ;
 	}
 
-	std::string arg = extractArg(line);
-	std::string username = arg.substr(0, arg.find(' '));
-	std::string realname = arg.substr(arg.find(' ') + 1);
+	std::string argStr = extractArg(line);
+	std::vector<std::string> args = getArgsWithColon(argStr);
 
-	client.setUsername(username);
-	client.setRealname(realname);
+	if (args.size() < 2)
+	{// 461 ERR_NEEDMOREPARAMS
+		client.sendMessage(createReply(Reply::ERR_NEEDMOREPARAMS, client.getNickname(), "USER") );
+		return ;
+	}
+	
+	client.setUsername(args[0]);
+	client.setRealname(args[1]); // could be args.back() if it detects ':' to better mimic IRC
 
 	if (!client.isRegistered())
 		attemptRegistration(client);

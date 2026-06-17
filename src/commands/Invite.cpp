@@ -23,6 +23,7 @@ void Server::handleInvite(Client& client, const std::string& line)
 	}
 
 	channel = getChannel(channelName);
+
 	if (!channel)
 	{ // ERR_NOSUCHCHANNEL (403)
 		client.sendMessage(createReply(Reply::ERR_NOSUCHCHANNEL, client.getNickname(), channelName));
@@ -45,7 +46,7 @@ void Server::handleInvite(Client& client, const std::string& line)
 	}
 
 	// SUCCESS
-	clientJoinChannel(*invited, channel->getName());
+	channel->addClientInvite(invited);
 	invited->sendMessage(client.getPrefix() + "INVITE " + nickname + " :"
 		+ channelName + "\r\n");
 	client.sendMessage(createReply(Reply::RPL_INVITING, client.getNickname(),

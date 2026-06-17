@@ -12,6 +12,8 @@ std::string extractArg(const std::string& line);
 std::vector<std::string> extractMultipleArgs(const std::string& line);
 std::vector<std::string> splitString(const std::string& str, char delim);
 std::string normalizeString(const std::string& str);
+std::vector<std::string> getArgsWithColon(const std::string& str);
+std::vector<std::string> getArgs(const std::string& str);
 
 bool areEqualCapitalized(const std::string& str1, const std::string& str2);
 
