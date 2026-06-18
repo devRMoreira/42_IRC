@@ -49,10 +49,14 @@ void Server::handleNick(Client& client, const std::string& line)
 
 	std::vector<std::string> args = getArgs(line); 
 	std::string nick = "";
+	
 	if (args.empty() )
 	{
-		client.sendMessage(createReply(Reply::ERR_NONICKNAMEGIVEN,
-			client.getNickname()) );
+		if (client.isRegistered())
+			client.sendMessage(createReply(Reply::ERR_NONICKNAMEGIVEN, "*") );
+		else
+			client.sendMessage(createReply(Reply::ERR_NONICKNAMEGIVEN,
+				client.getNickname()) );
 		return ;
 	}
 	
@@ -102,7 +106,7 @@ void Server::handleUser(Client& client, const std::string& line)
 	if (args.size() < 2)
 	{ // 461 ERR_NEEDMOREPARAMS
 		client.sendMessage(createReply(Reply::ERR_NEEDMOREPARAMS,
-			client.getNickname(), "USER") );
+			"*", "USER") );
 		return ;
 	}
 	
