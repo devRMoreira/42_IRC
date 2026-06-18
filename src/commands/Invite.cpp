@@ -36,7 +36,7 @@ void Server::handleInvite(Client& client, const std::string& line)
 			client.getNickname(), channelName));
 		return ;
 	}
-	if (!channel->isMember(&client) )
+	else if (!channel->isMember(&client) )
 	{ // ERR_NOTONCHANNEL (442)
 		client.sendMessage(createReply(Reply::ERR_NOTONCHANNEL,
 			client.getNickname(), channelName));
@@ -48,7 +48,7 @@ void Server::handleInvite(Client& client, const std::string& line)
 			client.getNickname(), channelName));
 		return;
 	}
-	if (channel->isMember(invited) )
+	else if (channel->isMember(invited) )
 	{ // ERR_USERONCHANNEL (443)
 		client.sendMessage(createReply(Reply::ERR_USERONCHANNEL,
 			client.getNickname(), nickname, channelName));

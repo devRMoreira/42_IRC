@@ -17,9 +17,9 @@ void Server::handleKick(Client& client, const std::string& line)
 	}
 	
 	std::string reason = ""; // optional parameter
-
 	std::string channelName = args[0];
 	std::string nickname = args[1];
+
 	if (args.size() >= 3)
 	{
 		if (args.back()[0] == ':')
