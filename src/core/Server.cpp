@@ -77,17 +77,17 @@ void Server::disconnectClient(int fd)
 
 	for(it = _channels.begin(); it != _channels.end();)
 	{
-		if(it->second.isMember(_clients[fd]))
-		{
-			it->second.removeClient(*_clients[fd]);
 
-			if(it->second.isEmpty())
-			{
-				_channels.erase(it++);
-				continue;
-			}
+		it->second.removeClient(*_clients[fd]);
+
+		if(it->second.isEmpty())
+		{
+			_channels.erase(it++);
 		}
-		++it;
+		else
+		{
+			++it;
+		}
 	}
 
 	removePfd(fd);

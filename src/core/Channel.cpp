@@ -46,8 +46,10 @@ void Channel::removeClient(Client& client)
 			break;
 	}
 
-	if (it != _members.end() )
-		_members.erase(it);
+	if (it == _members.end())
+		return;
+
+	_members.erase(it);
 
 	removeClientInvite(&client);
 	this->broadcast(client, client.getPrefix() + "QUIT :Client Quit\r\n");
