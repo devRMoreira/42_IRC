@@ -41,13 +41,13 @@ void Server::handleMode(Client& client, Channel& channel, std::string modeString
 			adding = false;
 		else if(c == ModeFlag::INVITE)
 		{
-			channel.setInviteOnly(adding);
-			channel.broadcast(modeMsg(client, channel, adding, c));
+			if(channel.setInviteOnly(adding))
+				channel.broadcast(modeMsg(client, channel, adding, c));
 		}
 		else if(c == ModeFlag::TOPIC)
 		{
-			channel.setTopicProtected(adding);
-			channel.broadcast(modeMsg(client, channel, adding, c));
+			if(channel.setTopicProtected(adding))
+				channel.broadcast(modeMsg(client, channel, adding, c));
 		}
 		else if(c == ModeFlag::KEY)
 		{

@@ -29,22 +29,22 @@ class Channel
 		std::string getModeString() const;
 
 		bool isTopicProtected() const;
-		void setTopicProtected(const bool val);
+		bool setTopicProtected(const bool val);
 
 		std::string getTopic() const;
-		void setTopic(const std::string& str);
+		bool setTopic(const std::string& str);
 
 		bool isKeyProtected() const;
 
 		bool isInviteOnly() const;
-		void setInviteOnly(const bool val);
+		bool setInviteOnly(const bool val);
 
 		bool hasUserLimit() const;
 		unsigned int getUserLimit() const;
-		void setUserLimit(unsigned int n);
+		bool setUserLimit(unsigned int n);
 
 		std::string getKey() const;
-		void setKey(const std::string& str);
+		bool setKey(const std::string& str);
 
 		std::string getName() const;
 

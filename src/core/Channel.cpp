@@ -67,11 +67,6 @@ void Channel::setOperator(const Client* client, bool val)
 	}
 }
 
-void Channel::setTopic(const std::string& str)
-{
-	_topic = str;
-}
-
 void Channel::broadcast(Client& sender, const std::string& msg)
 {
 	for(size_t i = 0; i < _members.size(); i++)
@@ -191,6 +186,49 @@ bool Channel::isClientInvited(const Client* client)
 	return false;
 }
 
+bool Channel::setTopic(const std::string& str)
+{
+	if(_topic == str)
+		return false;
+
+	_topic = str;
+	return true;
+}
+
+bool Channel::setKey(const std::string& str)
+{
+	if(_key == str)
+		return false;
+
+	_key = str;
+	return true;
+}
+bool Channel::setUserLimit(unsigned int n)
+{
+	if(_userLimit == n)
+		return false;
+
+	_userLimit = n;
+	return true;
+}
+
+bool Channel::setInviteOnly(const bool val)
+{
+	if(_inviteOnly == val)
+		return false;
+
+	_inviteOnly = val;
+	return true;
+}
+bool Channel::setTopicProtected(const bool val)
+{
+	if(_topicProtected == val)
+		return false;
+
+	_topicProtected = val;
+	return true;
+}
+
 bool Channel::isEmpty() const
 {
 	return _members.empty();
@@ -214,25 +252,6 @@ bool Channel::hasUserLimit() const
 unsigned int Channel::getUserLimit() const
 {
 	return _userLimit;
-}
-
-void Channel::setKey(const std::string& str)
-{
-	_key = str;
-}
-void Channel::setUserLimit(unsigned int n)
-{
-	if(n > 0)
-		_userLimit = n;
-}
-
-void Channel::setInviteOnly(const bool val)
-{
-	_inviteOnly = val;
-}
-void Channel::setTopicProtected(const bool val)
-{
-	_topicProtected = val;
 }
 
 std::string Channel::getName() const
