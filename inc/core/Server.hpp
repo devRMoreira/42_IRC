@@ -61,8 +61,6 @@ class Server
 		void createNewChannel(Client&  client, const std::string& arg);
 		void clientJoinChannel(Client&  client, const std::string& arg);
 
-		const std::string errorMessage(int errCode);
-
 		Channel* getChannel(const std::string& name);
 		Client* getClient(const std::string& nick);
 };

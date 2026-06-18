@@ -71,17 +71,31 @@ void Server::removePfd(int fd)
 
 void Server::disconnectClient(int fd)
 {
-	std::string username = _clients[fd]->getUsername();
+	std::string username = _clients[fd]->getNickname();
 
-	//! remove from channels when implemented before deleting
+	std::map<std::string, Channel>::iterator it;
+
+	for(it = _channels.begin(); it != _channels.end();)
+	{
+		if(it->second.isMember(_clients[fd]))
+		{
+			it->second.removeClient(*_clients[fd]);
+
+			if(it->second.isEmpty())
+			{
+				_channels.erase(it++);
+				continue;
+			}
+		}
+		++it;
+	}
 
 	removePfd(fd);
 
 	delete _clients[fd];
 	_clients.erase(fd);
 
-
-	std::cout << "Client " << username << " disconnected.\n";
+	std::cout << "Client " << username << "| fd: " << fd << " disconnected.\n";
 }
 
 void Server::connectClient(int fd)
@@ -179,10 +193,10 @@ void Server::handleLine(Client& client, const std::string& line)
 		handleNick(client, line);
 	else if(cmd == "USER")
 		handleUser(client, line);
-	
+
 	else if(!client.isRegistered())
 		client.sendMessage(createReply(Reply::ERR_NOTREGISTERED, client.getNickname()));
-	
+
 	else if(cmd == "JOIN")
 		handleJoin(client, line);
 	else if(cmd == "MODE")

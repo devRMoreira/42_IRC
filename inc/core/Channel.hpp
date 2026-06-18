@@ -24,6 +24,8 @@ class Channel
 
 		bool isMember(const Client* client) const;
 
+		bool isEmpty() const;
+
 		std::string getModeString() const;
 
 		bool isTopicProtected() const;

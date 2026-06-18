@@ -45,8 +45,12 @@ void Channel::removeClient(Client& client)
 		if (it->client == &client)
 			break;
 	}
+
 	if (it != _members.end() )
 		_members.erase(it);
+
+	removeClientInvite(&client);
+	this->broadcast(client, client.getPrefix() + "QUIT :Client Quit\r\n");
 }
 
 void Channel::setOperator(const Client* client, bool val)
@@ -183,6 +187,11 @@ bool Channel::isClientInvited(const Client* client)
 	}
 
 	return false;
+}
+
+bool Channel::isEmpty() const
+{
+	return _members.empty();
 }
 
 bool Channel::isKeyProtected() const
