@@ -46,29 +46,36 @@ void Server::handleNick(Client& client, const std::string& line)
 		return ;
 	}
 
-	std::string arg = extractArg(line);
-	arg = getArgs(arg)[0];
+	std::vector<std::string> args = getArgs(line); 
+	std::string nick = "";
+	if (args.empty() )
+	{
+		client.sendMessage(createReply(Reply::ERR_NONICKNAMEGIVEN, client.getNickname()) );
+		return ;
+	}
+	
+	nick = args[0];
 
 	std::map<int, Client*>::iterator it;
 	for (it = _clients.begin(); it != _clients.end(); it++)
 	{
-		if (it->second->isRegistered() && areEqualCapitalized(arg, it->second->getNickname()) )
+		if (it->second->isRegistered() && areEqualCapitalized(nick, it->second->getNickname()) )
 		{ // 433 ERR_NICKNAMEINUSE
 			if (client.isRegistered())
-				client.sendMessage(createReply(Reply::ERR_NICKNAMEINUSE, client.getNickname(), arg) );
+				client.sendMessage(createReply(Reply::ERR_NICKNAMEINUSE, client.getNickname(), nick) );
 			else
-				client.sendMessage(createReply(Reply::ERR_NICKNAMEINUSE, "*", arg) );
+				client.sendMessage(createReply(Reply::ERR_NICKNAMEINUSE, "*", nick) );
 			return ;
 		}
 	}
 
-	if (arg[0] == '#' || arg[0] == ':')
+	if (nick[0] == '#' || nick[0] == ':')
 	{ // 432 ERR_ERRONEUSNICKNAME
-		client.sendMessage(createReply(Reply::ERR_ERRONEUSNICKNAME, client.getNickname(), arg) );
+		client.sendMessage(createReply(Reply::ERR_ERRONEUSNICKNAME, client.getNickname(), nick) );
 		return ;
 	}
 	
-	client.setNickname(arg);
+	client.setNickname(nick);
 
 	if (!client.isRegistered())
 		attemptRegistration(client);
@@ -84,17 +91,19 @@ void Server::handleUser(Client& client, const std::string& line) // needs more c
 		return ;
 	}
 
-	std::string argStr = extractArg(line);
-	std::vector<std::string> args = getArgsWithColon(argStr);
+	std::vector<std::string> args = getArgsWithColon(line); 
 
 	if (args.size() < 2)
-	{// 461 ERR_NEEDMOREPARAMS
+	{ // 461 ERR_NEEDMOREPARAMS
 		client.sendMessage(createReply(Reply::ERR_NEEDMOREPARAMS, client.getNickname(), "USER") );
 		return ;
 	}
 	
 	client.setUsername(args[0]);
-	client.setRealname(args[1]); // could be args.back() if it detects ':' to better mimic IRC
+	if (args.back()[0] == ':')
+		client.setRealname(args.back().substr(1) ); // substr removes ':'
+	else
+		client.setRealname(args[1]);
 
 	if (!client.isRegistered())
 		attemptRegistration(client);

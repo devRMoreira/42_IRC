@@ -199,6 +199,8 @@ std::vector<std::string> getArgsWithColon(const std::string& line)
 	std::stringstream ss(line);
 	std::string arg;
 
+	ss >> arg; // skip command
+
 	while(ss >> arg) // already skips leading whitespace
 	{
 		if (arg[0] != ':')
@@ -207,7 +209,7 @@ std::vector<std::string> getArgsWithColon(const std::string& line)
 		{
 			if (arg.size() > 1)
 			{
-				std::string lastArg = arg.substr(1);
+				std::string lastArg = arg;
 				std::string rest;
 				std::getline(ss, rest);
 				lastArg += rest;
@@ -225,6 +227,8 @@ std::vector<std::string> getArgs(const std::string& line)
 	std::vector<std::string> args;
 	std::stringstream ss(line);
 	std::string arg;
+
+	ss >> arg; // skip command
 
 	while(ss >> arg)
 		args.push_back(arg);

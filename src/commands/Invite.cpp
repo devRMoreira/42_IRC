@@ -5,13 +5,19 @@
 #include "../../inc/constants.hpp"
 #include "../../inc/message.hpp"
 
-//MISSING BETTER PARSING/ : USAGE
-
 void Server::handleInvite(Client& client, const std::string& line)
 {
-	std::string arg = extractArg(line);
-	std::string nickname = arg.substr(0, arg.find(' '));
-	std::string channelName = arg.substr(arg.find(' ') + 1);
+	std::vector<std::string> args = getArgsWithColon(line);
+
+	if (args.size() < 2)
+	{ // 461 ERR_NEEDMOREPARAMS
+		client.sendMessage(createReply(Reply::ERR_NEEDMOREPARAMS,
+			client.getNickname(), "INVITE") );
+		return ;
+	}
+	
+	std::string nickname = args[0];
+	std::string channelName = args[1];
 
 	Channel * channel = NULL;
 	Client * invited = getClient(nickname);
