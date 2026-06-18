@@ -28,7 +28,6 @@ void Server::handleKick(Client& client, const std::string& line)
 			reason = ":" + args[2];
 	}	
 
-	Channel * channel = NULL;
 	Client * nickToKick = getClient(nickname);
 
 	if (!nickToKick)
@@ -38,7 +37,8 @@ void Server::handleKick(Client& client, const std::string& line)
 		return ;
 	}
 
-	channel = getChannel(channelName);
+	Channel * channel = getChannel(channelName);
+	
 	if (!channel)
 	{ // ERR_NOSUCHCHANNEL (403)
 		client.sendMessage(createReply(Reply::ERR_NOSUCHCHANNEL,

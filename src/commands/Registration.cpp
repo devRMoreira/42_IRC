@@ -34,7 +34,8 @@ void Server::handlePass(Client& client, const std::string& line)
 	}
 	else
 	{ // 462 ERR_ALREADYREGISTERED
-		client.sendMessage(createReply(Reply::ERR_ALREADYREGISTERED, client.getNickname()));
+		client.sendMessage(createReply(Reply::ERR_ALREADYREGISTERED,
+			client.getNickname()));
 	}
 }
 
@@ -50,7 +51,8 @@ void Server::handleNick(Client& client, const std::string& line)
 	std::string nick = "";
 	if (args.empty() )
 	{
-		client.sendMessage(createReply(Reply::ERR_NONICKNAMEGIVEN, client.getNickname()) );
+		client.sendMessage(createReply(Reply::ERR_NONICKNAMEGIVEN,
+			client.getNickname()) );
 		return ;
 	}
 	
@@ -59,19 +61,23 @@ void Server::handleNick(Client& client, const std::string& line)
 	std::map<int, Client*>::iterator it;
 	for (it = _clients.begin(); it != _clients.end(); it++)
 	{
-		if (it->second->isRegistered() && areEqualCapitalized(nick, it->second->getNickname()) )
+		if (it->second->isRegistered()
+			&& areEqualCapitalized(nick, it->second->getNickname()) )
 		{ // 433 ERR_NICKNAMEINUSE
 			if (client.isRegistered())
-				client.sendMessage(createReply(Reply::ERR_NICKNAMEINUSE, client.getNickname(), nick) );
+				client.sendMessage(createReply(Reply::ERR_NICKNAMEINUSE,
+					client.getNickname(), nick) );
 			else
-				client.sendMessage(createReply(Reply::ERR_NICKNAMEINUSE, "*", nick) );
+				client.sendMessage(createReply(Reply::ERR_NICKNAMEINUSE,
+					"*", nick) );
 			return ;
 		}
 	}
 
 	if (nick[0] == '#' || nick[0] == ':')
 	{ // 432 ERR_ERRONEUSNICKNAME
-		client.sendMessage(createReply(Reply::ERR_ERRONEUSNICKNAME, client.getNickname(), nick) );
+		client.sendMessage(createReply(Reply::ERR_ERRONEUSNICKNAME,
+			client.getNickname(), nick) );
 		return ;
 	}
 	
@@ -83,7 +89,7 @@ void Server::handleNick(Client& client, const std::string& line)
 		client.sendMessage(":ircserv NICK :" + client.getNickname() + "\r\n");
 }
 
-void Server::handleUser(Client& client, const std::string& line) // needs more checks
+void Server::handleUser(Client& client, const std::string& line)
 {
 	if (!client.isPassAccepted() )
 	{
@@ -95,7 +101,8 @@ void Server::handleUser(Client& client, const std::string& line) // needs more c
 
 	if (args.size() < 2)
 	{ // 461 ERR_NEEDMOREPARAMS
-		client.sendMessage(createReply(Reply::ERR_NEEDMOREPARAMS, client.getNickname(), "USER") );
+		client.sendMessage(createReply(Reply::ERR_NEEDMOREPARAMS,
+			client.getNickname(), "USER") );
 		return ;
 	}
 	
@@ -108,5 +115,6 @@ void Server::handleUser(Client& client, const std::string& line) // needs more c
 	if (!client.isRegistered())
 		attemptRegistration(client);
 	else // 462 ERR_ALREADYREGISTERED
-		client.sendMessage(createReply(Reply::ERR_ALREADYREGISTERED, client.getNickname()) );
+		client.sendMessage(createReply(Reply::ERR_ALREADYREGISTERED,
+			client.getNickname()) );
 }
