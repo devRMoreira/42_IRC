@@ -7,32 +7,50 @@
 
 #include <iostream>
 
-//MISSING BETTER PARSING/ : USAGE
-
 void Server::handlePrivMsg(Client& sender, const std::string& line)
 {
-	std::string arg = extractArg(line);
-	std::string targetName = arg.substr(0, arg.find(' '));
-	std::string msg = arg.substr(arg.find(' ') + 1);
+	std::vector<std::string> args = getArgsWithColon(line);
+
+	if (args.size() < 2)
+	{ // 461 ERR_NEEDMOREPARAMS
+		sender.sendMessage(createReply(Reply::ERR_NEEDMOREPARAMS,
+			sender.getNickname(), "PRIVMSG") );
+		return ;
+	}
+	
+	std::string targetName = args[0];
+	std::string msg;
+
+	if (args.back()[0] == ':')
+		msg = args.back();
+	else
+		msg = ":" + args[1];
 
 	if (targetName[0] == '#') 
 	{
 		Channel * channel = getChannel(targetName);
 		if (channel)
         {
-            std::cout << "broadly casting\n";
-			channel->broadcast(sender, sender.getPrefix() + "PRIVMSG " + targetName
-            + " :" + msg + "\r\n");
+			channel->broadcast(sender, sender.getPrefix() + "PRIVMSG "
+				+ targetName + " :" + msg + "\r\n");
         }
-		else // 403
-			sender.sendMessage(createReply(Reply::ERR_NOSUCHCHANNEL, sender.getNickname(), targetName) );
+		else // 403 ERR_NOSUCHCHANNEL
+		{
+			sender.sendMessage(createReply(Reply::ERR_NOSUCHCHANNEL,
+				sender.getNickname(), targetName) );
+		}
 		return ;
 	}
 
 	Client * targetUser = getClient(targetName);
 	if (targetUser)
-		targetUser->sendMessage(sender.getPrefix() + "PRIVMSG " + targetName
-            + " :" + msg + "\r\n");
-	else
-		sender.sendMessage(createReply(Reply::ERR_NOSUCHNICK, sender.getNickname(), targetName) );
+	{
+		targetUser->sendMessage(sender.getPrefix() + "PRIVMSG "
+			+ targetName + " :" + msg + "\r\n");
+	}
+	else // 401 ERR_NOSUCHNICK
+	{
+		sender.sendMessage(createReply(Reply::ERR_NOSUCHNICK,
+			sender.getNickname(), targetName) );
+	}
 }

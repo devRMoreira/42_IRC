@@ -5,43 +5,61 @@
 #include "../../inc/constants.hpp"
 #include "../../inc/message.hpp"
 
-//MISSING BETTER PARSING/REASON/: USAGE
-
 void Server::handleKick(Client& client, const std::string& line)
 {
-	std::string arg = extractArg(line);
-	std::string channelName = arg.substr(0, arg.find(' '));
-	std::string nickname = arg.substr(arg.find(' ') + 1);
+	std::vector<std::string> args = getArgsWithColon(line);
 
-	std::string reason = "reason";
+	if (args.size() < 2)
+	{ // 461 ERR_NEEDMOREPARAMS
+		client.sendMessage(createReply(Reply::ERR_NEEDMOREPARAMS,
+			client.getNickname(), "KICK") );
+		return ;
+	}
+	
+	std::string reason = ""; // optional parameter
+	std::string channelName = args[0];
+	std::string nickname = args[1];
 
-	Channel * channel = NULL;
-	Client * kicked = getClient(nickname);
+	if (args.size() >= 3)
+	{
+		if (args.back()[0] == ':')
+			reason = args.back();
+		else
+			reason = ":" + args[2];
+	}	
 
-	if (!kicked)
+	Client * nickToKick = getClient(nickname);
+
+	if (!nickToKick)
 	{ // ERR_NOSUCHNICK (401)
-		client.sendMessage(createReply(Reply::ERR_NOSUCHNICK, client.getNickname(), channelName));
+		client.sendMessage(createReply(Reply::ERR_NOSUCHNICK,
+			client.getNickname(), channelName));
 		return ;
 	}
 
-	channel = getChannel(channelName);
+	Channel * channel = getChannel(channelName);
+	
 	if (!channel)
 	{ // ERR_NOSUCHCHANNEL (403)
-		client.sendMessage(createReply(Reply::ERR_NOSUCHCHANNEL, client.getNickname(), channelName));
+		client.sendMessage(createReply(Reply::ERR_NOSUCHCHANNEL,
+			client.getNickname(), channelName));
 		return ;
 	}
-	else if (!channel->isMember(kicked) )
+	else if (!channel->isMember(nickToKick) )
 	{ // ERR_USERNOTINCHANNEL (441) 
-		client.sendMessage(createReply(Reply::ERR_USERNOTINCHANNEL, client.getNickname(), nickname, channelName));
+		client.sendMessage(createReply(Reply::ERR_USERNOTINCHANNEL,
+			client.getNickname(), nickname, channelName));
 		return ;
 	}
 	else if (!channel->isOperator(&client) )
 	{ // ERR_CHANOPRIVSNEEDED (482)
-		client.sendMessage(createReply(Reply::ERR_CHANOPRIVSNEEDED, client.getNickname(), channelName));
+		client.sendMessage(createReply(Reply::ERR_CHANOPRIVSNEEDED,
+			client.getNickname(), channelName));
 		return ;
 	}
 
-	//SUCESS
-	channel->broadcast(client.getPrefix() +  " KICK " + channelName + " " + nickname + " :" + reason);
-	channel->removeClient(*kicked);
+	// SUCCESS
+	channel->broadcast(client.getPrefix() +  " KICK " + channelName + " "
+		+ nickname + " " + reason + "\r\n");
+	channel->removeClient(*nickToKick);
 }

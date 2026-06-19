@@ -5,47 +5,58 @@
 #include "../../inc/constants.hpp"
 #include "../../inc/message.hpp"
 
-//MISSING BETTER PARSING/ : USAGE
-
 void Server::handleInvite(Client& client, const std::string& line)
 {
-	std::string arg = extractArg(line);
-	std::string nickname = arg.substr(0, arg.find(' '));
-	std::string channelName = arg.substr(arg.find(' ') + 1);
+	std::vector<std::string> args = getArgs(line);
 
-	Channel * channel = NULL;
+	if (args.size() < 2)
+	{ // 461 ERR_NEEDMOREPARAMS
+		client.sendMessage(createReply(Reply::ERR_NEEDMOREPARAMS,
+			client.getNickname(), "INVITE") );
+		return ;
+	}
+	
+	std::string nickname = args[0];
+	std::string channelName = args[1];
+
 	Client * invited = getClient(nickname);
-
+	
 	if (!invited)
 	{ // ERR_NOSUCHCHANNEL (403)
-		client.sendMessage(createReply(Reply::ERR_NOSUCHNICK, client.getNickname(), channelName));
+		client.sendMessage(createReply(Reply::ERR_NOSUCHNICK,
+			client.getNickname(), channelName));
 		return ; 
 	}
 
-	channel = getChannel(channelName);
+	Channel * channel = getChannel(channelName);
+
 	if (!channel)
 	{ // ERR_NOSUCHCHANNEL (403)
-		client.sendMessage(createReply(Reply::ERR_NOSUCHCHANNEL, client.getNickname(), channelName));
+		client.sendMessage(createReply(Reply::ERR_NOSUCHCHANNEL,
+			client.getNickname(), channelName));
 		return ;
 	}
-	if (!channel->isMember(&client) )
+	else if (!channel->isMember(&client) )
 	{ // ERR_NOTONCHANNEL (442)
-		client.sendMessage(createReply(Reply::ERR_NOTONCHANNEL, client.getNickname(), channelName));
+		client.sendMessage(createReply(Reply::ERR_NOTONCHANNEL,
+			client.getNickname(), channelName));
 		return ;
 	}
-	else if (channel->isInviteOnly() && !channel->isOperator(invited) )
+	else if (channel->isInviteOnly() && !channel->isOperator(&client) )
 	{ // ERR_CHANOPRIVSNEEDED (482)
-		client.sendMessage(createReply(Reply::ERR_CHANOPRIVSNEEDED, client.getNickname(), channelName));
+		client.sendMessage(createReply(Reply::ERR_CHANOPRIVSNEEDED,
+			client.getNickname(), channelName));
 		return;
 	}
-	if (channel->isMember(invited) )
+	else if (channel->isMember(invited) )
 	{ // ERR_USERONCHANNEL (443)
-		client.sendMessage(createReply(Reply::ERR_USERONCHANNEL, client.getNickname(), nickname, channelName));
+		client.sendMessage(createReply(Reply::ERR_USERONCHANNEL,
+			client.getNickname(), nickname, channelName));
 		return ;
 	}
 
 	// SUCCESS
-	clientJoinChannel(*invited, channel->getName());
+	channel->addClientInvite(invited);
 	invited->sendMessage(client.getPrefix() + "INVITE " + nickname + " :"
 		+ channelName + "\r\n");
 	client.sendMessage(createReply(Reply::RPL_INVITING, client.getNickname(),

@@ -58,7 +58,7 @@ void Server::handleMode(Client& client, Channel& channel, std::string modeString
 				key = params[paramIndex++];
 			else
 			{
-				client.sendMessage(createReply(Reply::ERR_NEEDMOREPARAMS, client.getNickname()));
+				client.sendMessage(createReply(Reply::ERR_NEEDMOREPARAMS, client.getNickname(), "MODE"));
 				continue;
 			}
 			channel.setKey(key);
@@ -82,7 +82,7 @@ void Server::handleMode(Client& client, Channel& channel, std::string modeString
 					client.sendMessage(createReply(Reply::ERR_USERNOTINCHANNEL, client.getNickname(), nick, channel.getName()));
 			}
 			else
-				client.sendMessage(createReply(Reply::ERR_NEEDMOREPARAMS, client.getNickname()));
+				client.sendMessage(createReply(Reply::ERR_NEEDMOREPARAMS, client.getNickname(), "MODE"));
 
 		}
 		else if(c == ModeFlag::USER_LIMIT)
@@ -107,7 +107,7 @@ void Server::handleMode(Client& client, Channel& channel, std::string modeString
 				}
 			}
 			else
-				client.sendMessage(createReply(Reply::ERR_NEEDMOREPARAMS, client.getNickname()));
+				client.sendMessage(createReply(Reply::ERR_NEEDMOREPARAMS, client.getNickname(), "MODE"));
 		}
 		else
 			client.sendMessage(createReply(Reply::ERR_UMODEUNKNOWNFLAG, client.getNickname()));
