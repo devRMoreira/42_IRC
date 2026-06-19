@@ -42,7 +42,7 @@ void Server::handleInvite(Client& client, const std::string& line)
 			client.getNickname(), channelName));
 		return ;
 	}
-	else if (channel->isInviteOnly() && !channel->isOperator(invited) )
+	else if (channel->isInviteOnly() && !channel->isOperator(&client) )
 	{ // ERR_CHANOPRIVSNEEDED (482)
 		client.sendMessage(createReply(Reply::ERR_CHANOPRIVSNEEDED,
 			client.getNickname(), channelName));
