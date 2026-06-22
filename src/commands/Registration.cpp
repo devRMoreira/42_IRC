@@ -4,6 +4,8 @@
 #include "../../inc/constants.hpp"
 #include "../../inc/message.hpp"
 
+#include <iostream>
+
 void Server::attemptRegistration(Client& client)
 {
 	if(client.isRegistered())

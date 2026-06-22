@@ -32,7 +32,7 @@ void Server::handlePrivMsg(Client& sender, const std::string& line)
 		if (channel)
         {
 			channel->broadcast(sender, sender.getPrefix() + "PRIVMSG "
-				+ targetName + " :" + msg + "\r\n");
+				+ targetName + " " + msg + "\r\n");
         }
 		else // 403 ERR_NOSUCHCHANNEL
 		{
@@ -46,7 +46,7 @@ void Server::handlePrivMsg(Client& sender, const std::string& line)
 	if (targetUser)
 	{
 		targetUser->sendMessage(sender.getPrefix() + "PRIVMSG "
-			+ targetName + " :" + msg + "\r\n");
+			+ targetName + " " + msg + "\r\n");
 	}
 	else // 401 ERR_NOSUCHNICK
 	{
