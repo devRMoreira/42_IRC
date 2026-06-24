@@ -25,6 +25,7 @@ class Channel
 		bool isMember(const Client* client) const;
 
 		bool isEmpty() const;
+		bool isFull() const;
 
 		std::string getModeString() const;
 

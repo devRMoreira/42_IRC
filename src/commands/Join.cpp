@@ -110,6 +110,13 @@ void Server::handleJoin(Client& client, const std::string& line)
 				}
 			}
 
+			if(channel->isFull())
+			{
+				client.sendMessage(createReply(Reply::ERR_CHANNELISFULL,client.getNickname(), channelName));
+				continue;
+			}
+
+
 			clientJoinChannel(client, channelName);
 		}
 

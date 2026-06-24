@@ -234,6 +234,11 @@ bool Channel::isEmpty() const
 	return _members.empty();
 }
 
+bool Channel::isFull() const
+{
+	return hasUserLimit() && _members.size() >= _userLimit;
+}
+
 bool Channel::isKeyProtected() const
 {
 	return _key.empty();

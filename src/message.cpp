@@ -92,7 +92,7 @@ static std::string buildReply(Reply::Code code, const std::string& client, const
 			msg += client + " " + p1 + " :Not enough parameters";
 			break;
 
-		case(Reply::ERR_ALREADYREGISTERED): 
+		case(Reply::ERR_ALREADYREGISTERED):
 			msg += client + " :You may not reregister";
 			break;
 
@@ -100,8 +100,13 @@ static std::string buildReply(Reply::Code code, const std::string& client, const
 			msg += "* :Password incorrect";
 			break;
 
+		case(Reply::ERR_CHANNELISFULL):
+			msg += client + " " + p1 + " :Cannot join channel (+l)";
+			break;
+
 		case(Reply::ERR_INVITEONLYCHAN):
 			msg += client + " " + p1 + " :Cannot join channel (+i)";
+			break;
 
 		case(Reply::ERR_BADCHANNELKEY):
 			msg += client + " " + p1 + " :Cannot join channel (+k)";
