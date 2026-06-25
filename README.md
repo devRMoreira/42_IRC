@@ -1,12 +1,12 @@
 *This project has been created as part of the 42 curriculum by rimagalh, david-fe.*
 
-# ft_irc — Internet Relay Chat Server
+# ft_irc - Internet Relay Chat Server
 
 ## Description
 
-`ft_irc` is a fully functional IRC server written in **C++98**, developed as part of the 42 school curriculum. The goal of the project is to implement a real IRC server from scratch, capable of handling multiple clients simultaneously over TCP/IP, following the IRC protocol as defined in [RFC 1459](https://tools.ietf.org/html/rfc1459).
+`ft_irc` is a fully functional IRC server written in **C++98**. The goal of the project is to implement a real IRC server from scratch, capable of handling multiple clients simultaneously over TCP/IP, following the IRC protocol.
 
-The server supports the core features expected of any IRC server:
+The server supports:
 
 - Client authentication via a connection password
 - Nickname and username registration
@@ -24,15 +24,14 @@ The reference IRC client used for development and testing is **HexChat**.
 ## Features
 
 ### General
-- Multi-client support with no forking — all I/O is non-blocking
+- Multi-client support with no forking - all I/O is non-blocking
 - Single `poll()` instance managing all connections (listen, read, write)
-- TCP/IP communication (IPv4)
-- Partial data handling: incoming packets are buffered and assembled before processing
+- TCP/IP communication
 
 ### Supported Commands
 | Command  | Description                                      |
 |----------|--------------------------------------------------|
-| `PASS`   | Authenticate with the server password            |
+| `PASS`   | Authenticate with a password            |
 | `NICK`   | Set or change a nickname                         |
 | `USER`   | Set the username and realname                    |
 | `JOIN`   | Join a channel                                   |
@@ -66,11 +65,9 @@ The reference IRC client used for development and testing is **HexChat**.
 Clone the repository and build the project:
 
 ```bash
-git clone https://github.com/<your-repo>/ft_irc.git
 cd ft_irc
 make
 ```
-
 This produces the `ircserv` executable.
 
 ### Execution
@@ -79,37 +76,23 @@ This produces the `ircserv` executable.
 ./ircserv <port> <password>
 ```
 
-- `<port>` — The port number the server will listen on (e.g. `6667`)
-- `<password>` — The password IRC clients must use to connect
+- `<port>` - The port number the server will listen on (e.g. `3440`)
+- `<password>` - The password IRC clients must use to connect (e.g. `1234`)
 
 **Example:**
 
 ```bash
-./ircserv 6667 mypassword
+./ircserv 3440 1234
 ```
 
 ### Connecting with HexChat
 
-1. Open HexChat and go to **Add** a new network.
-2. Set the server address to `127.0.0.1/6667` (or your machine's IP and chosen port).
-3. Under **Server Password**, enter the password you launched the server with.
-4. Connect — you should be able to join channels and send messages normally.
-
-### Testing with `nc` (partial data handling)
-
-To verify the server correctly reconstructs split commands:
-
-```bash
-nc -C 127.0.0.1 6667
-```
-
-Then type and send data in chunks using `Ctrl+D` between parts:
-
-```
-com^Dman^Dd
-```
-
-This sends `com`, `man`, and `d\n` as separate packets. The server must buffer and reassemble them into the full command before processing.
+1. Open HexChat and fill in the user information.
+2. Click **Add** to setup a new network, and then **Edit**.
+3. Click **Add** and set the server address to `localhost/port`.
+4. Under **Password**, enter the password you launched the server with.
+5. Connect - you should be able to join channels and send messages normally.
+6. HexChat commands must be preceded with `/` so type `/JOIN <channelname>` to join a channel.
 
 ### Cleaning up
 
@@ -124,19 +107,13 @@ make re       # Full recompile
 ## Resources
 
 ### IRC Protocol
-- [RFC 1459 — Internet Relay Chat Protocol](https://tools.ietf.org/html/rfc1459) — The foundational specification for IRC
-- [RFC 2812 — IRC Client Protocol](https://tools.ietf.org/html/rfc2812) — Updated client protocol details
-- [Modern IRC Client Protocol](https://modern.ircdocs.horse/) — A clear, up-to-date reference for IRC commands and numerics
-- [Chirc project guide (USC)](http://chi.cs.uchicago.edu/chirc/index.html) — A structured guide to building an IRC server, useful for understanding message flow
+- [Modern IRC Client Protocol](https://modern.ircdocs.horse/) - A clear reference for IRC s
+- [Chirc project guide](http://chi.cs.uchicago.edu/chirc/index.html) - A structured guide to building an IRC server
 
 ### C++ / Networking
-- [Beej's Guide to Network Programming](https://beej.us/guide/bgnet/) — Comprehensive guide to BSD sockets in C
-- [`poll()` man page](https://man7.org/linux/man-pages/man2/poll.2.html) — Linux manual for the `poll` system call
-- [cppreference — C++98](https://en.cppreference.com/w/) — C++ standard library reference
-
-### HexChat
-- [HexChat Documentation](https://hexchat.readthedocs.io/en/latest/) — Official HexChat user and developer documentation
+- [Beej's Guide to Network Programming](https://beej.us/guide/bgnet/) - Comprehensive guide to BSD sockets in C
+- [cplusplus - C++98](https://cplusplus.com/) - C++ standard library reference
 
 ### AI Usage
 
-AI (Claude by Anthropic) was used during this project for **debugging and understanding errors** — specifically to help interpret cryptic compiler messages, trace unexpected runtime behaviour, and reason through edge cases in socket and buffer management. AI was not used to generate project code or architecture.
+Claude was used during this project for debugging and understanding errors and polishing this readme. AI was not used to generate project code or architecture.
