@@ -90,9 +90,10 @@ This produces the `ircserv` executable.
 1. Open HexChat and fill in the user information.
 2. Click **Add** to setup a new network, and then **Edit**.
 3. Click **Add** and set the server address to `localhost/port`.
-4. Under **Password**, enter the password you launched the server with.
-5. Connect - you should be able to join channels and send messages normally.
-6. HexChat commands must be preceded with `/` so type `/JOIN <channelname>` to join a channel.
+4. Uncheck the box that says `Use SSL for all the servers on this network`.
+5. Under **Password**, enter the password you launched the server with.
+6. Connect - you should be able to join channels and send messages normally.
+7. HexChat commands must be preceded with `/` so type `/JOIN <channelname>` to join a channel.
 
 ### Cleaning up
 
