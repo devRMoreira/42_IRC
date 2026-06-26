@@ -241,7 +241,7 @@ bool Channel::isFull() const
 
 bool Channel::isKeyProtected() const
 {
-	return _key.empty();
+	return !_key.empty();
 }
 
 bool Channel::isInviteOnly() const
